@@ -1,6 +1,10 @@
 [build]
   publish = "site"
 
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -8,9 +12,13 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
 
-[[headers]]
-  for = "/data/*"
-  [headers.values]
-    Cache-Control = "no-cache, no-store, must-revalidate"
-    Pragma = "no-cache"
-    Expires = "0"
+# Rewrite data requests to the API function (transparent to the dashboard)
+[[redirects]]
+  from = "/data/index.json"
+  to = "/api/court-data?type=index"
+  status = 200
+
+[[redirects]]
+  from = "/data/:date.json"
+  to = "/api/court-data?type=day&date=:date"
+  status = 200
