@@ -20,5 +20,5 @@
 
 [[redirects]]
   from = "/data/:date.json"
-  to = "/api/court-data/:date"
+  to = "/api/court-data/day/:date"
   status = 200
