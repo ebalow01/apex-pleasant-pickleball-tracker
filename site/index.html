@@ -505,7 +505,6 @@
         return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       });
       const occupied = readings.map(r => r.occupied_count);
-      const available = readings.map(r => r.available_count);
 
       if (chart) chart.destroy();
 
@@ -515,18 +514,10 @@
           labels,
           datasets: [
             {
-              label: 'Courts Occupied',
+              label: 'Courts In Use',
               data: occupied,
               borderColor: '#ef4444',
               backgroundColor: 'rgba(239,68,68,0.1)',
-              fill: true,
-              tension: 0.3,
-            },
-            {
-              label: 'Courts Available',
-              data: available,
-              borderColor: '#22c55e',
-              backgroundColor: 'rgba(34,197,94,0.1)',
               fill: true,
               tension: 0.3,
             },
