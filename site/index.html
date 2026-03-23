@@ -181,9 +181,35 @@
       border: 1px solid var(--border);
     }
 
-    .best-times {
+    .best-times-week {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .dow-picker {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.5rem;
+    }
+
+    .dow-btn {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .dow-btn:hover { border-color: var(--blue); }
+    .dow-btn.active { background: var(--blue); border-color: var(--blue); }
+
+    .best-times-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 0.5rem;
     }
 
@@ -207,6 +233,13 @@
     .time-cold {
       background: rgba(239, 68, 68, 0.1);
       color: var(--text-muted);
+    }
+
+    .no-data-msg {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 1rem;
     }
 
     .loading {
@@ -258,8 +291,11 @@
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
         Green = usually 4+ courts in use (good for pickup games)
       </p>
-      <div id="best-times" class="best-times">
-        <div class="loading">Collecting data...</div>
+      <div class="best-times-week">
+        <div id="dow-picker" class="dow-picker"></div>
+        <div id="best-times" class="best-times-grid">
+          <div class="loading">Collecting data...</div>
+        </div>
       </div>
     </div>
 
@@ -402,44 +438,85 @@
       });
     }
 
-    // Compute best times from all available data
-    async function computeBestTimes(index) {
-      // Aggregate by hour across all days
-      const hourBuckets = {};
-      for (let h = 5; h < 22; h++) hourBuckets[h] = [];
+    // Compute best times from all available data, broken out by day of week
+    const DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let bestTimesData = null; // { 0: { 5: [vals], 6: [vals], ... }, 1: { ... }, ... }
 
-      const datesToLoad = index.dates.slice(0, 14); // Last 14 days
+    async function computeBestTimes(index) {
+      // Build buckets: dayOfWeek -> hour -> [occupied counts]
+      bestTimesData = {};
+      for (let d = 0; d < 7; d++) {
+        bestTimesData[d] = {};
+        for (let h = 5; h < 22; h++) bestTimesData[d][h] = [];
+      }
+
+      const datesToLoad = index.dates.slice(0, 28); // Last 28 days (4 weeks)
       const allData = await Promise.all(datesToLoad.map(d => loadDay(d)));
 
-      for (const dayData of allData) {
+      for (let i = 0; i < datesToLoad.length; i++) {
+        const dateStr = datesToLoad[i];
+        const dayData = allData[i];
+        // Get day of week from the date string to avoid timezone issues
+        const dateParts = dateStr.split('-');
+        const dateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12);
+        const dow = dateObj.getDay();
+
         for (const r of dayData) {
           const hour = new Date(r.timestamp).getHours();
-          if (hourBuckets[hour] !== undefined) {
-            hourBuckets[hour].push(r.occupied_count);
+          if (bestTimesData[dow][hour] !== undefined) {
+            bestTimesData[dow][hour].push(r.occupied_count);
           }
         }
       }
 
-      const container = document.getElementById('best-times');
-      const entries = Object.entries(hourBuckets)
-        .filter(([_, vals]) => vals.length > 0)
-        .map(([hour, vals]) => {
-          const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-          return { hour: parseInt(hour), avg };
-        });
+      // Build day-of-week picker
+      const picker = document.getElementById('dow-picker');
+      const today = new Date().getDay();
+      picker.innerHTML = DOW_SHORT.map((name, i) => {
+        return `<button class="dow-btn ${i === today ? 'active' : ''}" data-dow="${i}">${name}</button>`;
+      }).join('');
 
-      if (entries.length === 0) {
-        container.innerHTML = '<div class="loading">Need more data — check back in a day or two.</div>';
+      picker.querySelectorAll('.dow-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          picker.querySelectorAll('.dow-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderBestTimes(parseInt(btn.dataset.dow));
+        });
+      });
+
+      // Show today's day by default
+      renderBestTimes(today);
+    }
+
+    function renderBestTimes(dow) {
+      const container = document.getElementById('best-times');
+      if (!bestTimesData) {
+        container.innerHTML = '<div class="no-data-msg">Collecting data...</div>';
         return;
       }
 
-      container.innerHTML = entries.map(({ hour, avg }) => {
+      const hourData = bestTimesData[dow];
+      const entries = Object.entries(hourData)
+        .filter(([_, vals]) => vals.length > 0)
+        .map(([hour, vals]) => {
+          const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+          const samples = vals.length;
+          return { hour: parseInt(hour), avg, samples };
+        });
+
+      if (entries.length === 0) {
+        container.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet — check back after a ${DOW_NAMES[dow]} has been tracked.</div>`;
+        return;
+      }
+
+      container.innerHTML = entries.map(({ hour, avg, samples }) => {
         const label = new Date(2026, 0, 1, hour).toLocaleTimeString('en-US', { hour: 'numeric' });
-        let cls, desc;
-        if (avg >= 4) { cls = 'time-hot'; desc = `${avg.toFixed(1)} avg in use`; }
-        else if (avg >= 2) { cls = 'time-warm'; desc = `${avg.toFixed(1)} avg in use`; }
-        else { cls = 'time-cold'; desc = `${avg.toFixed(1)} avg in use`; }
-        return `<div class="time-slot ${cls}"><strong>${label}</strong><br>${desc}</div>`;
+        let cls;
+        if (avg >= 4) { cls = 'time-hot'; }
+        else if (avg >= 2) { cls = 'time-warm'; }
+        else { cls = 'time-cold'; }
+        return `<div class="time-slot ${cls}"><strong>${label}</strong><br>${avg.toFixed(1)} avg in use<br><span style="font-size:0.75rem;opacity:0.7">${samples} sample${samples !== 1 ? 's' : ''}</span></div>`;
       }).join('');
     }
 
