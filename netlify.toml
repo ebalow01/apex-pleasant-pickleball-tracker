@@ -17,8 +17,10 @@
   from = "/data/index.json"
   to = "/api/court-data/index"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/data/*.json"
   to = "/api/court-data/day/:splat"
   status = 200
+  force = true
