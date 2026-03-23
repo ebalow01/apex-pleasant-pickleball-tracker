@@ -7,6 +7,27 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --green: #16a34a;
+      --red: #dc2626;
+      --yellow: #ca8a04;
+      --blue: #2563eb;
+      --chart-grid: rgba(148,163,184,0.3);
+      --chart-tick: #64748b;
+      --chart-legend: #64748b;
+      --status-good-bg: linear-gradient(135deg, #dcfce7, #bbf7d0);
+      --status-good-text: #166534;
+      --status-mod-bg: linear-gradient(135deg, #fef9c3, #fef08a);
+      --status-mod-text: #854d0e;
+      --status-low-bg: linear-gradient(135deg, #fee2e2, #fecaca);
+      --status-low-text: #991b1b;
+    }
+
+    [data-theme="dark"] {
       --bg: #0f172a;
       --surface: #1e293b;
       --border: #334155;
@@ -16,6 +37,38 @@
       --red: #ef4444;
       --yellow: #eab308;
       --blue: #3b82f6;
+      --chart-grid: rgba(51,65,85,0.5);
+      --chart-tick: #64748b;
+      --chart-legend: #94a3b8;
+      --status-good-bg: linear-gradient(135deg, #065f46, #064e3b);
+      --status-good-text: #e2e8f0;
+      --status-mod-bg: linear-gradient(135deg, #713f12, #78350f);
+      --status-mod-text: #e2e8f0;
+      --status-low-bg: linear-gradient(135deg, #7f1d1d, #991b1b);
+      --status-low-text: #e2e8f0;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f172a;
+        --surface: #1e293b;
+        --border: #334155;
+        --text: #e2e8f0;
+        --text-muted: #94a3b8;
+        --green: #22c55e;
+        --red: #ef4444;
+        --yellow: #eab308;
+        --blue: #3b82f6;
+        --chart-grid: rgba(51,65,85,0.5);
+        --chart-tick: #64748b;
+        --chart-legend: #94a3b8;
+        --status-good-bg: linear-gradient(135deg, #065f46, #064e3b);
+        --status-good-text: #e2e8f0;
+        --status-mod-bg: linear-gradient(135deg, #713f12, #78350f);
+        --status-mod-text: #e2e8f0;
+        --status-low-bg: linear-gradient(135deg, #7f1d1d, #991b1b);
+        --status-low-text: #e2e8f0;
+      }
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,18 +111,21 @@
     }
 
     .status-good {
-      background: linear-gradient(135deg, #065f46, #064e3b);
+      background: var(--status-good-bg);
       border: 1px solid var(--green);
+      color: var(--status-good-text);
     }
 
     .status-moderate {
-      background: linear-gradient(135deg, #713f12, #78350f);
+      background: var(--status-mod-bg);
       border: 1px solid var(--yellow);
+      color: var(--status-mod-text);
     }
 
     .status-low {
-      background: linear-gradient(135deg, #7f1d1d, #991b1b);
+      background: var(--status-low-bg);
       border: 1px solid var(--red);
+      color: var(--status-low-text);
     }
 
     .status-unknown {
@@ -256,10 +312,33 @@
     }
 
     footer a { color: var(--blue); text-decoration: none; }
+
+    .theme-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--blue);
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" style="position:relative;">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode"></button>
     <header>
       <h1>Pleasant Park Pickleball</h1>
       <p>Court availability tracker &middot; Apex, NC</p>
@@ -308,6 +387,42 @@
   <script>
     const API_BASE = '/api/court-data';
     let chart = null;
+
+    // Theme toggle
+    function getPreferredTheme() {
+      const stored = localStorage.getItem('theme');
+      if (stored) return stored;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+      document.getElementById('theme-toggle').textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+      // Re-render chart if it exists
+      if (chart) {
+        const style = getComputedStyle(document.documentElement);
+        chart.options.scales.x.ticks.color = style.getPropertyValue('--chart-tick').trim();
+        chart.options.scales.y.ticks.color = style.getPropertyValue('--chart-tick').trim();
+        chart.options.scales.x.grid.color = style.getPropertyValue('--chart-grid').trim();
+        chart.options.scales.y.grid.color = style.getPropertyValue('--chart-grid').trim();
+        chart.options.plugins.legend.labels.color = style.getPropertyValue('--chart-legend').trim();
+        chart.update();
+      }
+    }
+
+    const currentTheme = getPreferredTheme();
+    applyTheme(currentTheme);
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') || getPreferredTheme();
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
 
     // Refresh live camera image
     function refreshLiveImage() {
@@ -421,17 +536,17 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: '#94a3b8' } },
+            legend: { labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-legend').trim() } },
           },
           scales: {
             x: {
-              ticks: { color: '#64748b', maxRotation: 45 },
-              grid: { color: 'rgba(51,65,85,0.5)' },
+              ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-tick').trim(), maxRotation: 45 },
+              grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim() },
             },
             y: {
               min: 0, max: 6,
-              ticks: { color: '#64748b', stepSize: 1 },
-              grid: { color: 'rgba(51,65,85,0.5)' },
+              ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-tick').trim(), stepSize: 1 },
+              grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim() },
             },
           },
         },
