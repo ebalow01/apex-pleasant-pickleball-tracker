@@ -11,5 +11,18 @@
     },
     "available_count": 6,
     "occupied_count": 0
+  },
+  {
+    "timestamp": "2026-03-23T05:39:20.451554-04:00",
+    "courts": {
+      "court_1": "available",
+      "court_2": "available",
+      "court_3": "available",
+      "court_4": "available",
+      "court_5": "available",
+      "court_6": "available"
+    },
+    "available_count": 6,
+    "occupied_count": 0
   }
 ]
