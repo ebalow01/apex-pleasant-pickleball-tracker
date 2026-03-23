@@ -9,12 +9,12 @@ const HEADERS = {
 
 export default async function handler(request: Request) {
   const url = new URL(request.url);
-  const type = url.searchParams.get("type");
-  const date = url.searchParams.get("date");
+  const path = url.pathname;
 
   const store = getStore("court-data");
 
-  if (type === "index") {
+  // /api/court-data/index
+  if (path.endsWith("/index")) {
     try {
       const data = await store.get("index");
       return new Response(data || '{"dates":[]}', { headers: HEADERS });
@@ -23,25 +23,23 @@ export default async function handler(request: Request) {
     }
   }
 
-  if (type === "day" && date) {
-    // Validate date format
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return new Response("[]", { headers: HEADERS });
-    }
+  // /api/court-data/2026-03-23
+  const dateMatch = path.match(/\/(\d{4}-\d{2}-\d{2})$/);
+  if (dateMatch) {
     try {
-      const data = await store.get(date);
+      const data = await store.get(dateMatch[1]);
       return new Response(data || "[]", { headers: HEADERS });
     } catch {
       return new Response("[]", { headers: HEADERS });
     }
   }
 
-  return new Response('{"error":"Invalid request. Use ?type=index or ?type=day&date=YYYY-MM-DD"}', {
+  return new Response('{"error":"Use /api/court-data/index or /api/court-data/YYYY-MM-DD"}', {
     status: 400,
     headers: HEADERS,
   });
 }
 
 export const config: Config = {
-  path: "/api/court-data",
+  path: "/api/court-data/*",
 };

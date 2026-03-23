@@ -15,10 +15,10 @@
 # Rewrite data requests to the API function (transparent to the dashboard)
 [[redirects]]
   from = "/data/index.json"
-  to = "/api/court-data?type=index"
+  to = "/api/court-data/index"
   status = 200
 
 [[redirects]]
   from = "/data/:date.json"
-  to = "/api/court-data?type=day&date=:date"
+  to = "/api/court-data/:date"
   status = 200
