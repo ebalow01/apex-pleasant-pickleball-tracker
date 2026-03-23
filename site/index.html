@@ -306,7 +306,7 @@
   </div>
 
   <script>
-    const DATA_BASE = './data';
+    const API_BASE = '/api/court-data';
     let chart = null;
 
     // Refresh live camera image
@@ -318,7 +318,7 @@
     // Load data index
     async function loadIndex() {
       try {
-        const resp = await fetch(`${DATA_BASE}/index.json`);
+        const resp = await fetch(`${API_BASE}/index`);
         if (!resp.ok) return { dates: [] };
         return await resp.json();
       } catch {
@@ -329,7 +329,7 @@
     // Load a day's data
     async function loadDay(dateStr) {
       try {
-        const resp = await fetch(`${DATA_BASE}/${dateStr}.json`);
+        const resp = await fetch(`${API_BASE}/day/${dateStr}`);
         if (!resp.ok) return [];
         return await resp.json();
       } catch {

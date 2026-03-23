@@ -11,16 +11,3 @@
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
-
-# Rewrite data requests to the API function (transparent to the dashboard)
-[[redirects]]
-  from = "/data/index.json"
-  to = "/api/court-data/index"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/data/*.json"
-  to = "/api/court-data/day/:splat"
-  status = 200
-  force = true
