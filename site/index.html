@@ -291,25 +291,50 @@
       color: var(--text-muted);
     }
 
-    .hot-time-row {
-      display: flex;
-      align-items: center;
+    .hot-times-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
       gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: 6px;
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--green);
-      font-size: 0.9rem;
     }
 
-    .hot-time-row strong {
-      min-width: 90px;
+    @media (max-width: 700px) {
+      .hot-times-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
-    .hot-times-list {
+    @media (max-width: 400px) {
+      .hot-times-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .hot-day-col {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.35rem;
+    }
+
+    .hot-day-col .day-header {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hot-day-col .hot-time {
+      text-align: center;
+      padding: 0.3rem 0.25rem;
+      border-radius: 5px;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      font-size: 0.8rem;
+    }
+
+    .hot-day-col .no-hot {
+      text-align: center;
+      padding: 0.3rem 0.25rem;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-style: italic;
     }
 
     .no-data-msg {
@@ -639,48 +664,38 @@
         return;
       }
 
-      // Collect all green (avg >= 4) slots across all days
-      const hotSlots = [];
+      // Build columns for each day of week
+      let hasAnyHot = false;
+      let html = '<div class="hot-times-grid">';
       for (let d = 0; d < 7; d++) {
+        html += `<div class="hot-day-col"><div class="day-header">${DOW_SHORT[d]}</div>`;
         const hourData = bestTimesData[d];
-        for (const [hour, vals] of Object.entries(hourData)) {
+        let dayHasHot = false;
+        // Sort hours and render green ones
+        const hours = Object.keys(hourData).map(Number).sort((a, b) => a - b);
+        for (const hour of hours) {
+          const vals = hourData[hour];
           if (vals.length === 0) continue;
           const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
           if (avg >= 4) {
-            hotSlots.push({
-              dow: d,
-              hour: parseInt(hour),
-              avg,
-              samples: vals.length,
-            });
+            const label = new Date(2026, 0, 1, hour).toLocaleTimeString('en-US', { hour: 'numeric' });
+            html += `<div class="hot-time">${label}<br><span style="font-size:0.7rem;opacity:0.7">${avg.toFixed(1)} avg</span></div>`;
+            dayHasHot = true;
+            hasAnyHot = true;
           }
         }
+        if (!dayHasHot) {
+          html += `<div class="no-hot">no data</div>`;
+        }
+        html += '</div>';
       }
+      html += '</div>';
 
-      if (hotSlots.length === 0) {
+      if (!hasAnyHot) {
         container.innerHTML = '<div class="no-data-msg">No consistently busy times found yet — more data needed.</div>';
         return;
       }
 
-      // Sort by day of week, then hour
-      hotSlots.sort((a, b) => a.dow - b.dow || a.hour - b.hour);
-
-      // Group by day
-      const grouped = {};
-      for (const slot of hotSlots) {
-        if (!grouped[slot.dow]) grouped[slot.dow] = [];
-        grouped[slot.dow].push(slot);
-      }
-
-      let html = '<div class="hot-times-list">';
-      for (const [dow, slots] of Object.entries(grouped)) {
-        const times = slots.map(s => {
-          const label = new Date(2026, 0, 1, s.hour).toLocaleTimeString('en-US', { hour: 'numeric' });
-          return `${label} (${s.avg.toFixed(1)})`;
-        }).join(', ');
-        html += `<div class="hot-time-row"><strong>${DOW_NAMES[parseInt(dow)]}</strong><span>${times}</span></div>`;
-      }
-      html += '</div>';
       container.innerHTML = html;
     }
 
