@@ -223,7 +223,6 @@
       <button class="icon-btn" id="share-btn" aria-label="Share">
         <svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
       </button>
-      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark/light mode"></button>
     </div>
 
     <div class="hero-banner">
@@ -297,15 +296,14 @@
       moon: '<svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     };
 
-    // Theme
-    function getPreferredTheme() {
-      const stored = localStorage.getItem('theme');
-      if (stored) return stored;
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Auto-detect theme from browser preference (no toggle)
+    function applyAutoTheme() {
+      const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     }
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      document.getElementById('theme-toggle').innerHTML = theme === 'dark' ? ICONS.sun : ICONS.moon;
+    applyAutoTheme();
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      applyAutoTheme();
       if (chart) {
         const s = getComputedStyle(document.documentElement);
         chart.options.scales.x.ticks.color = s.getPropertyValue('--chart-tick').trim();
@@ -315,12 +313,6 @@
         chart.options.plugins.legend.labels.color = s.getPropertyValue('--chart-legend').trim();
         chart.update();
       }
-    }
-    applyTheme(getPreferredTheme());
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      const next = (document.documentElement.getAttribute('data-theme') || getPreferredTheme()) === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      applyTheme(next);
     });
 
     // Share
