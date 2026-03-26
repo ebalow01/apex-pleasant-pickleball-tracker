@@ -293,8 +293,9 @@
 
     .hot-times-grid {
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 0.5rem;
+      width: 100%;
     }
 
     @media (max-width: 700px) {
@@ -416,7 +417,7 @@
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
         Times when 4+ courts are typically in use (good for open play)
       </p>
-      <div id="hot-times-summary" class="best-times-grid" style="margin-bottom: 1rem;">
+      <div id="hot-times-summary" style="margin-bottom: 1rem;">
         <div class="loading">Collecting data...</div>
       </div>
       <button id="detail-toggle" class="day-btn" style="margin-bottom: 0.75rem; display: none;">Show daily breakdown</button>
