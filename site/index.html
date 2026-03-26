@@ -436,13 +436,24 @@
       lastUpdateTime = ts;
       const trend = getTrend(readings);
 
+      // Check sustained activity from recent readings
+      const recentHigh = readings.slice(-3); // ~30 min of data
+      const sustainedAt4Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 4);
+      const sustainedAt5Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 5);
+
       let vibeClass, headline, sub;
-      if (occupied >= 5) {
-        vibeClass = 'vibe-hot'; headline = "It's ON."; sub = `${occupied} of 6 courts are rocking right now`;
+      if (occupied >= 5 && sustainedAt5Plus) {
+        vibeClass = 'vibe-hot'; headline = 'Courts are packed.'; sub = 'People are rotating in -- get down here';
+      } else if (occupied >= 4 && sustainedAt4Plus) {
+        vibeClass = 'vibe-hot'; headline = 'Open play is rolling.'; sub = 'Steady action for a while now';
+      } else if (occupied >= 5) {
+        vibeClass = 'vibe-hot'; headline = "It's ON."; sub = `${occupied} of 6 courts going right now`;
       } else if (occupied === 4) {
-        vibeClass = 'vibe-hot'; headline = 'Open play is live.'; sub = '4 courts going -- great time to roll up';
-      } else if (occupied >= 2) {
-        vibeClass = 'vibe-warm'; headline = 'Warming up.'; sub = `${occupied} games going, room to jump in`;
+        vibeClass = 'vibe-hot'; headline = 'Open play is live.'; sub = 'Just getting going -- good time to roll up';
+      } else if (occupied === 3) {
+        vibeClass = 'vibe-warm'; headline = 'A few games going.'; sub = 'Likely hit or miss';
+      } else if (occupied === 2) {
+        vibeClass = 'vibe-warm'; headline = 'Warming up.'; sub = 'A couple games going';
       } else if (occupied === 1) {
         vibeClass = 'vibe-chill'; headline = 'Just getting started.'; sub = '1 court going -- bring a friend';
       } else {
