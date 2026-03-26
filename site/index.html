@@ -21,8 +21,8 @@
       --chart-legend: #64748b;
       --status-good-bg: linear-gradient(135deg, #dcfce7, #bbf7d0);
       --status-good-text: #166534;
-      --status-mod-bg: linear-gradient(135deg, #fef9c3, #fef08a);
-      --status-mod-text: #854d0e;
+      --status-mod-bg: var(--surface);
+      --status-mod-text: var(--text);
       --status-low-bg: linear-gradient(135deg, #fee2e2, #fecaca);
       --status-low-text: #991b1b;
     }
@@ -42,8 +42,8 @@
       --chart-legend: #94a3b8;
       --status-good-bg: linear-gradient(135deg, #065f46, #064e3b);
       --status-good-text: #e2e8f0;
-      --status-mod-bg: linear-gradient(135deg, #713f12, #78350f);
-      --status-mod-text: #e2e8f0;
+      --status-mod-bg: var(--surface);
+      --status-mod-text: var(--text);
       --status-low-bg: linear-gradient(135deg, #7f1d1d, #991b1b);
       --status-low-text: #e2e8f0;
     }
@@ -118,7 +118,7 @@
 
     .status-moderate {
       background: var(--status-mod-bg);
-      border: 1px solid var(--yellow);
+      border: 1px solid var(--border);
       color: var(--status-mod-text);
     }
 
