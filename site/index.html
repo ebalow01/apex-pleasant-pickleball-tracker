@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pleasant Park Pickleball - Court Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   <style>
@@ -18,62 +18,65 @@
       --accent: #2d6a4f;
       --accent-light: #40916c;
       --green: #2d6a4f;
-      --red: #c0392b;
+      --active: #e85d26;
+      --active-light: rgba(232,93,38,0.12);
       --yellow: #b7791f;
       --chart-grid: rgba(93,122,93,0.15);
       --chart-tick: #5e7a5e;
       --chart-legend: #5e7a5e;
-      --status-good-bg: linear-gradient(135deg, #d8f3dc, #b7e4c7);
-      --status-good-text: #1b4332;
-      --status-mod-bg: var(--surface);
-      --status-mod-text: var(--text);
-      --status-low-bg: linear-gradient(135deg, #fee2e2, #fecaca);
-      --status-low-text: #7f1d1d;
+      --vibe-hot-bg: linear-gradient(135deg, #fff7ed, #fed7aa);
+      --vibe-hot-text: #7c2d12;
+      --vibe-warm-bg: var(--surface);
+      --vibe-warm-text: var(--text);
+      --vibe-chill-bg: var(--surface);
+      --vibe-chill-text: var(--text-muted);
     }
 
     [data-theme="dark"] {
       --bg: #0d1b0d;
-      --surface: #162616;
+      --surface: #1a2e1a;
       --border: #2a3d2a;
       --text: #d4e8d4;
       --text-muted: #7fa37f;
       --accent: #52b788;
       --accent-light: #74c69d;
       --green: #52b788;
-      --red: #e74c3c;
+      --active: #f59e0b;
+      --active-light: rgba(245,158,11,0.15);
       --yellow: #f0c040;
       --chart-grid: rgba(127,163,127,0.2);
       --chart-tick: #7fa37f;
       --chart-legend: #7fa37f;
-      --status-good-bg: linear-gradient(135deg, #1b4332, #2d6a4f);
-      --status-good-text: #d4e8d4;
-      --status-mod-bg: var(--surface);
-      --status-mod-text: var(--text);
-      --status-low-bg: linear-gradient(135deg, #7f1d1d, #991b1b);
-      --status-low-text: #d4e8d4;
+      --vibe-hot-bg: linear-gradient(135deg, #451a03, #78350f);
+      --vibe-hot-text: #fef3c7;
+      --vibe-warm-bg: var(--surface);
+      --vibe-warm-text: var(--text);
+      --vibe-chill-bg: var(--surface);
+      --vibe-chill-text: var(--text-muted);
     }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --bg: #0d1b0d;
-        --surface: #162616;
+        --surface: #1a2e1a;
         --border: #2a3d2a;
         --text: #d4e8d4;
         --text-muted: #7fa37f;
         --accent: #52b788;
         --accent-light: #74c69d;
         --green: #52b788;
-        --red: #e74c3c;
+        --active: #f59e0b;
+        --active-light: rgba(245,158,11,0.15);
         --yellow: #f0c040;
         --chart-grid: rgba(127,163,127,0.2);
         --chart-tick: #7fa37f;
         --chart-legend: #7fa37f;
-        --status-good-bg: linear-gradient(135deg, #1b4332, #2d6a4f);
-        --status-good-text: #d4e8d4;
-        --status-mod-bg: var(--surface);
-        --status-mod-text: var(--text);
-        --status-low-bg: linear-gradient(135deg, #7f1d1d, #991b1b);
-        --status-low-text: #d4e8d4;
+        --vibe-hot-bg: linear-gradient(135deg, #451a03, #78350f);
+        --vibe-hot-text: #fef3c7;
+        --vibe-warm-bg: var(--surface);
+        --vibe-warm-text: var(--text);
+        --vibe-chill-bg: var(--surface);
+        --vibe-chill-text: var(--text-muted);
       }
     }
 
@@ -87,393 +90,140 @@
       background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l9.9-9.9h-2.828zM32 0l-3.486 3.485-1.414-1.414L30.172 0H32z' fill='%235e7a5e' fill-opacity='0.02'/%3E%3C/svg%3E");
     }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 1.5rem;
-      position: relative;
-    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 1.5rem; position: relative; }
 
-    /* Lucide-style inline SVG icons */
-    .icon {
-      width: 1em;
-      height: 1em;
-      vertical-align: -0.125em;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      display: inline-block;
-    }
+    .icon { width: 1em; height: 1em; vertical-align: -0.125em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
     .icon-sm { width: 16px; height: 16px; }
     .icon-md { width: 20px; height: 20px; vertical-align: -0.2em; margin-right: 0.35rem; }
 
-    .hero-banner {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 2rem;
-      padding: 3rem 1.5rem 2.5rem;
-      text-align: center;
-    }
-
-    .hero-banner::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url('./images/hero-paddle.jpg');
-      background-size: cover;
-      background-position: center;
-      opacity: 0.35;
-      z-index: 0;
-    }
-
+    /* Hero banner */
+    .hero-banner { position: relative; border-radius: 16px; overflow: hidden; margin-bottom: 1.5rem; padding: 2rem 1.5rem 1.5rem; text-align: center; }
+    .hero-banner::before { content: ''; position: absolute; inset: 0; background-image: url('./images/hero-paddle.jpg'); background-size: cover; background-position: center; opacity: 0.35; z-index: 0; }
     [data-theme="dark"] .hero-banner::before { opacity: 0.2; }
     @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero-banner::before { opacity: 0.2; } }
-
-    .hero-banner::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
-      z-index: 0;
-    }
-
+    .hero-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--bg) 100%); z-index: 0; }
     .hero-banner > * { position: relative; z-index: 1; }
-
-    .header-lockup {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.25rem;
-    }
-
+    .header-lockup { display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
     .header-logo { color: var(--accent); flex-shrink: 0; }
+    .hero-banner h1 { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; }
+    @media (min-width: 768px) { .hero-banner h1 { font-size: 3rem; } }
+    .hero-banner p { color: var(--text-muted); font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.35rem; letter-spacing: 0.02em; text-transform: uppercase; }
+    .hero-banner .brand-bar { display: block; width: 80px; height: 4px; background: var(--accent); border-radius: 2px; margin: 0.75rem auto 0; }
 
-    .hero-banner h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
+    /* Vibe check status banner */
+    .vibe-banner { border-radius: 14px; margin-bottom: 1.5rem; padding: 1.5rem; border: 1px solid var(--border); text-align: center; transition: background 0.4s ease, border-color 0.4s ease; }
+    .vibe-banner .vibe-count { font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; display: block; }
+    .vibe-banner .vibe-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-top: 0.15rem; }
+    .vibe-banner .vibe-headline { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 0.5rem; }
+    .vibe-banner .vibe-sub { font-size: 0.85rem; font-weight: 400; margin-top: 0.25rem; opacity: 0.8; }
+    .vibe-banner .vibe-meta { font-size: 0.7rem; opacity: 0.5; margin-top: 0.5rem; }
 
-    .hero-banner p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.35rem;
-    }
+    @keyframes pulse-glow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 24px rgba(232, 93, 38, 0.3); } }
+    .vibe-hot .vibe-count { color: var(--active); animation: pulse-glow 2s ease-in-out infinite; }
+    .vibe-hot { background: var(--vibe-hot-bg); border-color: var(--active); color: var(--vibe-hot-text); }
+    .vibe-warm { background: var(--vibe-warm-bg); border-color: var(--accent); color: var(--vibe-warm-text); }
+    .vibe-warm .vibe-count { color: var(--accent); }
+    .vibe-chill { background: var(--vibe-chill-bg); border-color: var(--border); color: var(--vibe-chill-text); }
+    .vibe-chill .vibe-count { color: var(--text-muted); }
+    .vibe-closed { background: var(--surface); border-color: var(--border); color: var(--text-muted); }
 
-    .hero-banner .brand-bar {
-      display: block;
-      width: 60px;
-      height: 3px;
-      background: var(--accent);
-      border-radius: 2px;
-      margin: 0.75rem auto 0;
-    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s ease-in-out infinite; margin-right: 4px; vertical-align: middle; }
 
-    .status-banner {
-      padding: 1.25rem;
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      font-size: 1.2rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    /* Court strip */
+    .court-strip { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+    .court-strip-label { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
 
-    .status-banner .banner-icon { flex-shrink: 0; }
-    .status-banner .banner-content { flex: 1; }
+    .court-cell { flex: 1; max-width: 140px; aspect-ratio: 2/3; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: transform 0.15s ease; gap: 0.25rem; }
+    .court-cell::before { content: ''; position: absolute; left: 20%; right: 20%; top: 50%; border-top: 1px dashed var(--border); opacity: 0.5; }
+    .court-cell:hover { transform: translateY(-2px); }
 
-    .status-good {
-      background: var(--status-good-bg);
-      border-left-color: var(--green);
-      color: var(--status-good-text);
-    }
+    .court-cell-active { background: var(--active-light); border: 2px solid var(--active); }
+    .court-cell-active .court-cell-num { color: var(--active); }
+    .court-cell-active .court-cell-status { color: var(--active); font-weight: 600; }
 
-    .status-moderate {
-      background: var(--status-mod-bg);
-      border-left-color: var(--accent);
-      color: var(--status-mod-text);
-    }
+    .court-cell-open { background: transparent; border: 2px dashed var(--border); }
+    .court-cell-open .court-cell-num { color: var(--text-muted); }
+    .court-cell-open .court-cell-status { color: var(--text-muted); }
 
-    .status-low {
-      background: var(--status-low-bg);
-      border-left-color: var(--red);
-      color: var(--status-low-text);
-    }
+    .court-cell-num { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 700; line-height: 1; position: relative; z-index: 1; }
+    .court-cell-status { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; position: relative; z-index: 1; }
 
-    .status-unknown {
-      background: var(--surface);
-      border-left-color: var(--border);
-    }
-
-    .courts-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.75rem;
-      margin-bottom: 1.5rem;
-    }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .court-cell { animation: fadeSlideUp 0.3s ease-out both; }
+    .court-cell:nth-child(1) { animation-delay: 0s; }
+    .court-cell:nth-child(2) { animation-delay: 0.04s; }
+    .court-cell:nth-child(3) { animation-delay: 0.08s; }
+    .court-cell:nth-child(4) { animation-delay: 0.12s; }
+    .court-cell:nth-child(5) { animation-delay: 0.16s; }
+    .court-cell:nth-child(6) { animation-delay: 0.2s; }
 
     @media (max-width: 500px) {
-      .courts-grid { grid-template-columns: repeat(2, 1fr); }
+      .court-strip { flex-wrap: wrap; }
+      .court-cell { flex: 0 0 calc(33.33% - 0.35rem); max-width: none; }
     }
 
-    .court-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-top: 4px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem;
-      text-align: center;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .court-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    .court-card-available { border-top-color: var(--green); }
-    .court-card-occupied { border-top-color: var(--red); }
-
-    .court-card .court-num {
-      font-size: 0.6rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-    }
-    .court-card .court-num-val {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1.2;
-    }
-
-    .court-status {
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      margin-top: 0.5rem;
-    }
-
-    .court-available {
-      background: rgba(45, 106, 79, 0.1);
-      color: var(--green);
-    }
-
-    .court-occupied {
-      background: rgba(192, 57, 43, 0.1);
-      color: var(--red);
-    }
-
-    .section {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .section h2 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .day-picker { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-
-    .day-btn {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-family: inherit;
-    }
-
+    /* Sections */
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
+    .section h2 { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; }
+    .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+    .day-picker { display: flex; gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .day-picker::-webkit-scrollbar { display: none; }
+    .day-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; min-height: 44px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-family: inherit; white-space: nowrap; display: inline-flex; align-items: center; }
     .day-btn:hover { border-color: var(--accent-light); }
     .day-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
     .chart-container { position: relative; height: 280px; }
 
+    /* Best times - heat map style */
     .best-times-week { display: flex; flex-direction: column; gap: 1rem; }
-
-    .dow-picker { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
-
-    .dow-btn {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-family: inherit;
-    }
-
+    .dow-picker { display: flex; gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 0.5rem; }
+    .dow-picker::-webkit-scrollbar { display: none; }
+    .dow-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.5rem 1rem; min-height: 44px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-family: inherit; white-space: nowrap; display: inline-flex; align-items: center; }
     .dow-btn:hover { border-color: var(--accent-light); }
     .dow-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    .best-times-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.5rem;
-    }
+    .best-times-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; }
+    .time-slot { padding: 0.5rem; border-radius: 6px; text-align: center; font-size: 0.85rem; }
+    .time-hot { background: var(--active-light); color: var(--active); border-left: 3px solid var(--active); }
+    .time-warm { background: rgba(45,106,79,0.06); color: var(--accent); border-left: 3px solid var(--accent); }
+    .time-cold { background: rgba(0,0,0,0.02); color: var(--text-muted); border-left: 3px solid var(--border); }
 
-    .time-slot {
-      padding: 0.5rem;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 0.85rem;
-    }
-
-    .time-hot {
-      border-left: 3px solid var(--green);
-      background: rgba(45,106,79,0.08);
-      color: var(--green);
-    }
-
-    .time-warm {
-      border-left: 3px solid var(--yellow);
-      background: rgba(183,121,31,0.06);
-      color: var(--yellow);
-    }
-
-    .time-cold {
-      border-left: 3px solid var(--border);
-      background: rgba(0,0,0,0.02);
-      color: var(--text-muted);
-    }
-
-    .hot-times-grid {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    @media (max-width: 700px) {
-      .hot-times-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    @media (max-width: 400px) {
-      .hot-times-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
+    .hot-times-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.5rem; width: 100%; }
+    @media (max-width: 700px) { .hot-times-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 400px) { .hot-times-grid { grid-template-columns: repeat(2, 1fr); } }
     .hot-day-col { display: flex; flex-direction: column; gap: 0.35rem; }
+    .hot-day-col .day-header { font-size: 0.8rem; font-weight: 600; color: var(--text); text-align: center; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border); }
 
-    .hot-day-col .day-header {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-      text-align: center;
-      padding-bottom: 0.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .hot-day-col .hot-time {
-      text-align: center;
-      padding: 0.3rem 0.25rem;
-      border-radius: 5px;
-      border-left: 3px solid var(--green);
-      background: rgba(45,106,79,0.08);
-      color: var(--green);
-      font-size: 0.8rem;
-    }
-
-    .hot-day-col .no-hot {
-      text-align: center;
-      padding: 0.3rem 0.25rem;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-style: italic;
-    }
-
-    .hot-day-col-today {
-      background: rgba(45,106,79,0.06);
-      border-radius: 6px;
-      padding: 0.25rem;
-    }
-
-    .hot-day-col-today .day-header {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
+    .hot-day-col .hot-time { text-align: center; padding: 0.35rem 0.25rem; border-radius: 5px; font-size: 0.8rem; }
+    .hot-day-col .no-hot { text-align: center; padding: 0.3rem 0.25rem; color: var(--text-muted); font-size: 0.75rem; font-style: italic; }
+    .hot-day-col-today { background: rgba(45,106,79,0.06); border-radius: 6px; padding: 0.25rem; }
+    .hot-day-col-today .day-header { color: var(--accent); border-bottom-color: var(--accent); }
 
     .trend-indicator { font-size: 0.85rem; font-weight: normal; opacity: 0.85; }
     .no-data-msg { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem; }
     .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-    }
-
+    footer { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.8rem; }
     footer a { color: var(--accent); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
-    .theme-toggle {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    .theme-toggle:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .banner-sub { font-size: 0.8rem; display: block; font-weight: normal; margin-top: 4px; opacity: 0.8; }
+    .top-bar { display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .icon-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); width: 44px; height: 44px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, color 0.2s; }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
   <div class="container">
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode">
-      <svg class="icon" width="20" height="20" viewBox="0 0 24 24" id="theme-icon">
-        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-    </button>
+    <div class="top-bar">
+      <button class="icon-btn" id="share-btn" aria-label="Share">
+        <svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
+      <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark/light mode"></button>
+    </div>
+
     <div class="hero-banner">
       <div class="header-lockup">
-        <svg class="header-logo" viewBox="0 0 64 64" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="header-logo" viewBox="0 0 64 64" width="44" height="44" fill="none">
           <rect x="16" y="4" width="26" height="32" rx="13" fill="currentColor" opacity="0.9"/>
           <rect x="25" y="34" width="8" height="16" rx="2" fill="currentColor" opacity="0.9"/>
           <line x1="27" y1="38" x2="33" y2="38" stroke="var(--bg)" stroke-width="1.5" opacity="0.5"/>
@@ -487,15 +237,37 @@
       </div>
       <p>
         <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        Court availability tracker &middot; Apex, NC
+        Live court tracker for the Pleasant Park crew &middot; Apex, NC
       </p>
       <span class="brand-bar"></span>
+    </div>
+
+    <div id="vibe-banner" class="vibe-banner vibe-closed">
+      Loading...
+    </div>
+
+    <div id="courts-strip-wrapper">
+      <div class="court-strip-label">Courts 1&ndash;6</div>
+      <div id="courts-grid" class="court-strip"></div>
+    </div>
+
+    <div class="section">
+      <div class="meta-row">
+        <h2>
+          <svg class="icon icon-md" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Today's Action
+        </h2>
+        <div id="day-picker" class="day-picker"></div>
+      </div>
+      <div class="chart-container">
+        <canvas id="history-chart"></canvas>
+      </div>
     </div>
 
     <div class="section">
       <h2>
         <svg class="icon icon-md" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Best Times to Play
+        When It's Poppin'
       </h2>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
         Times when 4+ courts are typically in use (good for open play)
@@ -512,25 +284,6 @@
       </div>
     </div>
 
-    <div id="status-banner" class="status-banner status-unknown">
-      Loading current status...
-    </div>
-
-    <div id="courts-grid" class="courts-grid"></div>
-
-    <div class="section">
-      <div class="meta-row">
-        <h2>
-          <svg class="icon icon-md" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Today's Activity
-        </h2>
-        <div id="day-picker" class="day-picker"></div>
-      </div>
-      <div class="chart-container">
-        <canvas id="history-chart"></canvas>
-      </div>
-    </div>
-
     <footer>
       <svg class="header-logo" viewBox="0 0 64 64" width="16" height="16" fill="none" style="color: var(--text-muted); vertical-align: -0.15em; margin-right: 0.25rem;">
         <rect x="16" y="4" width="26" height="32" rx="13" fill="currentColor" opacity="0.9"/>
@@ -540,8 +293,7 @@
         <circle cx="50" cy="12" r="1.2" fill="var(--bg)"/>
         <circle cx="48" cy="16" r="1.2" fill="var(--bg)"/>
       </svg>
-      Data sourced from <a href="https://www.apexnc.org/1163/Pleasant-Park" target="_blank">Apex Parks</a> via ParQuery.
-      Updated every 15 minutes, 5am&ndash;10pm ET.
+      Court data pulled from <a href="https://www.apexnc.org/1163/Pleasant-Park" target="_blank">Apex Parks</a> every 15 min, dawn to dusk.
     </footer>
   </div>
 
@@ -549,10 +301,7 @@
     const API_BASE = '/api/court-data';
     let chart = null;
 
-    // SVG icon templates
     const ICONS = {
-      checkCircle: '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-      circle: '<svg class="icon icon-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
       trendUp: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
       trendDown: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>',
       minus: '<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
@@ -560,82 +309,102 @@
       moon: '<svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     };
 
-    // Theme toggle
+    // Theme
     function getPreferredTheme() {
       const stored = localStorage.getItem('theme');
       if (stored) return stored;
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       document.getElementById('theme-toggle').innerHTML = theme === 'dark' ? ICONS.sun : ICONS.moon;
       if (chart) {
-        const style = getComputedStyle(document.documentElement);
-        chart.options.scales.x.ticks.color = style.getPropertyValue('--chart-tick').trim();
-        chart.options.scales.y.ticks.color = style.getPropertyValue('--chart-tick').trim();
-        chart.options.scales.x.grid.color = style.getPropertyValue('--chart-grid').trim();
-        chart.options.scales.y.grid.color = style.getPropertyValue('--chart-grid').trim();
-        chart.options.plugins.legend.labels.color = style.getPropertyValue('--chart-legend').trim();
+        const s = getComputedStyle(document.documentElement);
+        chart.options.scales.x.ticks.color = s.getPropertyValue('--chart-tick').trim();
+        chart.options.scales.y.ticks.color = s.getPropertyValue('--chart-tick').trim();
+        chart.options.scales.x.grid.color = s.getPropertyValue('--chart-grid').trim();
+        chart.options.scales.y.grid.color = s.getPropertyValue('--chart-grid').trim();
+        chart.options.plugins.legend.labels.color = s.getPropertyValue('--chart-legend').trim();
         chart.update();
       }
     }
-
     applyTheme(getPreferredTheme());
-
     document.getElementById('theme-toggle').addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') || getPreferredTheme();
-      const next = current === 'dark' ? 'light' : 'dark';
+      const next = (document.documentElement.getAttribute('data-theme') || getPreferredTheme()) === 'dark' ? 'light' : 'dark';
       localStorage.setItem('theme', next);
       applyTheme(next);
     });
 
-    // Load data
+    // Share
+    document.getElementById('share-btn').addEventListener('click', async () => {
+      const banner = document.getElementById('vibe-banner');
+      const headline = banner.querySelector('.vibe-headline');
+      const text = headline ? `Pleasant Park Pickleball -- ${headline.textContent}` : 'Pleasant Park Pickleball -- check the courts!';
+      const url = window.location.href;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'Pleasant Park Pickleball', text, url }); } catch {}
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        const btn = document.getElementById('share-btn');
+        btn.style.color = 'var(--active)';
+        setTimeout(() => btn.style.color = '', 1500);
+      }
+    });
+
+    // Data
     async function loadIndex() {
-      try {
-        const resp = await fetch(`${API_BASE}/index`);
-        if (!resp.ok) return { dates: [] };
-        return await resp.json();
-      } catch { return { dates: [] }; }
+      try { const r = await fetch(`${API_BASE}/index`); if (!r.ok) return { dates: [] }; return await r.json(); }
+      catch { return { dates: [] }; }
+    }
+    async function loadDay(d) {
+      try { const r = await fetch(`${API_BASE}/day/${d}`); if (!r.ok) return []; return await r.json(); }
+      catch { return []; }
     }
 
-    async function loadDay(dateStr) {
-      try {
-        const resp = await fetch(`${API_BASE}/day/${dateStr}`);
-        if (!resp.ok) return [];
-        return await resp.json();
-      } catch { return []; }
+    // Relative time
+    let lastUpdateTime = null;
+    function relativeTime(date) {
+      const m = Math.floor((Date.now() - date.getTime()) / 60000);
+      if (m < 1) return 'just now';
+      if (m === 1) return '1 min ago';
+      if (m < 60) return `${m} min ago`;
+      return `${Math.floor(m/60)}h ${m%60}m ago`;
     }
+    setInterval(() => {
+      if (!lastUpdateTime) return;
+      const el = document.getElementById('last-update-time');
+      if (el) el.textContent = relativeTime(lastUpdateTime);
+    }, 30000);
 
     // Trend
     function getTrend(readings) {
       if (readings.length < 3) return '';
-      const recent = readings.slice(-3).map(r => r.occupied_count);
-      if (recent[recent.length - 1] > recent[0]) return ` <span class="trend-indicator">${ICONS.trendUp} trending up</span>`;
-      if (recent[recent.length - 1] < recent[0]) return ` <span class="trend-indicator">${ICONS.trendDown} winding down</span>`;
-      return ` <span class="trend-indicator">${ICONS.minus} holding steady</span>`;
+      const r = readings.slice(-3).map(x => x.occupied_count);
+      if (r[r.length-1] > r[0]) return `${ICONS.trendUp} trending up`;
+      if (r[r.length-1] < r[0]) return `${ICONS.trendDown} winding down`;
+      return `${ICONS.minus} holding steady`;
     }
 
-    function isOffHours() {
-      const hour = new Date().getHours();
-      return hour < 5 || hour >= 22;
-    }
+    function isOffHours() { const h = new Date().getHours(); return h < 5 || h >= 22; }
 
-    // Status banner & court cards
+    // Vibe check & court strip
     function updateCurrentStatus(readings) {
-      const banner = document.getElementById('status-banner');
+      const banner = document.getElementById('vibe-banner');
       const grid = document.getElementById('courts-grid');
+      const wrapper = document.getElementById('courts-strip-wrapper');
 
       if (isOffHours()) {
-        banner.innerHTML = '<div class="banner-content">Courts are closed — tracking resumes at 5 AM</div>';
-        banner.className = 'status-banner status-unknown';
-        grid.innerHTML = '';
+        banner.innerHTML = '<div class="vibe-headline">Courts are sleeping.</div><div class="vibe-sub">We\'ll be back at dawn.</div>';
+        banner.className = 'vibe-banner vibe-closed';
+        wrapper.style.display = 'none';
         return;
       }
 
+      wrapper.style.display = 'block';
+
       if (!readings || readings.length === 0) {
-        banner.innerHTML = '<div class="banner-content">No data yet — check back after the first poll runs</div>';
-        banner.className = 'status-banner status-unknown';
+        banner.innerHTML = '<div class="vibe-headline">No data yet</div><div class="vibe-sub">Check back after the first poll runs</div>';
+        banner.className = 'vibe-banner vibe-closed';
         grid.innerHTML = '';
         return;
       }
@@ -643,44 +412,44 @@
       const latest = readings[readings.length - 1];
       const occupied = latest.occupied_count;
       const ts = new Date(latest.timestamp);
-      const timeStr = ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-      const ageMin = (Date.now() - ts.getTime()) / 60000;
-      const staleNote = ageMin > 30 ? ' (data may be stale)' : '';
+      lastUpdateTime = ts;
       const trend = getTrend(readings);
 
-      let statusIcon, statusText, statusClass;
-      if (occupied >= 4) {
-        statusIcon = ICONS.checkCircle;
-        statusText = `Good time to play! ${occupied}/6 courts in use`;
-        statusClass = 'status-good';
+      let vibeClass, headline, sub;
+      if (occupied >= 5) {
+        vibeClass = 'vibe-hot'; headline = "It's ON."; sub = `${occupied} of 6 courts are rocking right now`;
+      } else if (occupied === 4) {
+        vibeClass = 'vibe-hot'; headline = 'Open play is live.'; sub = '4 courts going -- great time to roll up';
       } else if (occupied >= 2) {
-        statusIcon = ICONS.minus;
-        statusText = `Moderate activity: ${occupied}/6 courts in use`;
-        statusClass = 'status-moderate';
+        vibeClass = 'vibe-warm'; headline = 'Warming up.'; sub = `${occupied} games going, room to jump in`;
+      } else if (occupied === 1) {
+        vibeClass = 'vibe-chill'; headline = 'Just getting started.'; sub = '1 court going -- bring a friend';
       } else {
-        statusIcon = ICONS.circle;
-        statusText = `Low activity: ${occupied}/6 courts in use`;
-        statusClass = 'status-low';
+        vibeClass = 'vibe-chill'; headline = 'Quiet out there.'; sub = 'Courts are wide open if you want \'em';
       }
 
-      banner.innerHTML = `<div class="banner-icon">${statusIcon}</div><div class="banner-content">${statusText}${trend}<span class="banner-sub">as of ${timeStr}${staleNote} (updates every 15 min)</span></div>`;
-      banner.className = `status-banner ${statusClass}`;
+      const trendHtml = trend ? `<div class="vibe-sub trend-indicator">${trend}</div>` : '';
 
-      // Court cards
+      banner.innerHTML = `
+        <span class="vibe-count">${occupied}/6</span>
+        <span class="vibe-label">courts in play</span>
+        <div class="vibe-headline">${headline}</div>
+        <div class="vibe-sub">${sub}</div>
+        ${trendHtml}
+        <div class="vibe-meta"><span class="live-dot"></span>LIVE -- updated <span id="last-update-time">${relativeTime(ts)}</span></div>
+      `;
+      banner.className = `vibe-banner ${vibeClass}`;
+
+      // Court strip
       grid.innerHTML = '';
       for (let i = 1; i <= 6; i++) {
         const key = `court_${i}`;
         const status = latest.courts[key] || 'unknown';
-        const isAvail = status === 'available';
-        const cardClass = isAvail ? 'court-card-available' : 'court-card-occupied';
-        const icon = isAvail ? ICONS.circle : ICONS.checkCircle;
+        const isActive = status !== 'available';
         grid.innerHTML += `
-          <div class="court-card ${cardClass}">
-            <div class="court-num">COURT</div>
-            <div class="court-num-val">${i}</div>
-            <span class="court-status ${isAvail ? 'court-available' : 'court-occupied'}">
-              ${icon} ${isAvail ? 'Available' : 'Occupied'}
-            </span>
+          <div class="court-cell ${isActive ? 'court-cell-active' : 'court-cell-open'}">
+            <span class="court-cell-num">${i}</span>
+            <span class="court-cell-status">${isActive ? 'In Play' : 'Open'}</span>
           </div>`;
       }
     }
@@ -690,117 +459,67 @@
       const ctx = document.getElementById('history-chart').getContext('2d');
       const labels = readings.map(r => new Date(r.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
       const occupied = readings.map(r => r.occupied_count);
-      const style = getComputedStyle(document.documentElement);
+      const s = getComputedStyle(document.documentElement);
 
       if (chart) chart.destroy();
-
       chart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'Courts In Use',
-            data: occupied,
-            borderColor: style.getPropertyValue('--accent').trim(),
-            backgroundColor: 'rgba(45,106,79,0.08)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 3,
-            pointBackgroundColor: style.getPropertyValue('--accent').trim(),
-          }],
-        },
+        data: { labels, datasets: [{
+          label: 'Courts In Use', data: occupied,
+          borderColor: s.getPropertyValue('--accent').trim(),
+          backgroundColor: 'rgba(45,106,79,0.08)', fill: true, tension: 0.3,
+          pointRadius: 3, pointBackgroundColor: s.getPropertyValue('--accent').trim(),
+        }] },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: {
-            legend: { labels: { color: style.getPropertyValue('--chart-legend').trim() } },
-            annotation: {
-              annotations: {
-                threshold: {
-                  type: 'line',
-                  yMin: 4, yMax: 4,
-                  borderColor: 'rgba(45, 106, 79, 0.5)',
-                  borderWidth: 2,
-                  borderDash: [6, 4],
-                  label: {
-                    display: true,
-                    content: 'Open play (4+)',
-                    position: 'start',
-                    backgroundColor: 'rgba(45, 106, 79, 0.12)',
-                    color: style.getPropertyValue('--green').trim(),
-                    font: { size: 11, family: 'Inter' },
-                    padding: 3,
-                  },
-                },
-              },
-            },
+            legend: { labels: { color: s.getPropertyValue('--chart-legend').trim() } },
+            annotation: { annotations: { threshold: {
+              type: 'line', yMin: 4, yMax: 4,
+              borderColor: 'rgba(232, 93, 38, 0.5)', borderWidth: 2, borderDash: [6, 4],
+              label: { display: true, content: 'Open play (4+)', position: 'start',
+                backgroundColor: 'rgba(232, 93, 38, 0.1)', color: s.getPropertyValue('--active') ? s.getPropertyValue('--active').trim() : '#e85d26',
+                font: { size: 11, family: 'Inter' }, padding: 3 },
+            } } },
           },
           scales: {
-            x: {
-              ticks: { color: style.getPropertyValue('--chart-tick').trim(), maxRotation: 45 },
-              grid: { color: style.getPropertyValue('--chart-grid').trim() },
-            },
-            y: {
-              min: 0, max: 6,
-              ticks: { color: style.getPropertyValue('--chart-tick').trim(), stepSize: 1 },
-              grid: { color: style.getPropertyValue('--chart-grid').trim() },
-            },
+            x: { ticks: { color: s.getPropertyValue('--chart-tick').trim(), maxRotation: 45 }, grid: { color: s.getPropertyValue('--chart-grid').trim() } },
+            y: { min: 0, max: 6, ticks: { color: s.getPropertyValue('--chart-tick').trim(), stepSize: 1 }, grid: { color: s.getPropertyValue('--chart-grid').trim() } },
           },
         },
       });
     }
 
     // Best times
-    const DOW_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const DOW_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let bestTimesData = null;
 
     async function computeBestTimes(index) {
       bestTimesData = {};
-      for (let d = 0; d < 7; d++) {
-        bestTimesData[d] = {};
-        for (let h = 5; h < 22; h++) bestTimesData[d][h] = [];
-      }
-
+      for (let d = 0; d < 7; d++) { bestTimesData[d] = {}; for (let h = 5; h < 22; h++) bestTimesData[d][h] = []; }
       const datesToLoad = index.dates.slice(0, 28);
       const allData = await Promise.all(datesToLoad.map(d => loadDay(d)));
-
       for (let i = 0; i < datesToLoad.length; i++) {
-        const dateStr = datesToLoad[i];
-        const dayData = allData[i];
-        const dateParts = dateStr.split('-');
-        const dateObj = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12);
-        const dow = dateObj.getDay();
-
-        for (const r of dayData) {
+        const ds = datesToLoad[i], dd = allData[i];
+        const p = ds.split('-');
+        const dow = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), 12).getDay();
+        for (const r of dd) {
           if (r.occupied_count === 0) continue;
           const hour = new Date(r.timestamp).getHours();
-          if (bestTimesData[dow][hour] !== undefined) {
-            bestTimesData[dow][hour].push(r.occupied_count);
-          }
+          if (bestTimesData[dow][hour] !== undefined) bestTimesData[dow][hour].push(r.occupied_count);
         }
       }
-
       renderHotTimesSummary();
-
       const picker = document.getElementById('dow-picker');
       const today = new Date().getDay();
-      picker.innerHTML = DOW_SHORT.map((name, i) =>
-        `<button class="dow-btn ${i === today ? 'active' : ''}" data-dow="${i}">${name}</button>`
-      ).join('');
-
-      picker.querySelectorAll('.dow-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          picker.querySelectorAll('.dow-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderBestTimes(parseInt(btn.dataset.dow));
-        });
-      });
-
+      picker.innerHTML = DOW_SHORT.map((n,i) => `<button class="dow-btn ${i===today?'active':''}" data-dow="${i}">${n}</button>`).join('');
+      picker.querySelectorAll('.dow-btn').forEach(b => b.addEventListener('click', () => {
+        picker.querySelectorAll('.dow-btn').forEach(x => x.classList.remove('active'));
+        b.classList.add('active'); renderBestTimes(parseInt(b.dataset.dow));
+      }));
       renderBestTimes(today);
-
-      const toggleBtn = document.getElementById('detail-toggle');
-      const detailDiv = document.getElementById('daily-detail');
+      const toggleBtn = document.getElementById('detail-toggle'), detailDiv = document.getElementById('daily-detail');
       toggleBtn.style.display = 'inline-block';
       toggleBtn.addEventListener('click', () => {
         const showing = detailDiv.style.display !== 'none';
@@ -810,88 +529,62 @@
     }
 
     function renderHotTimesSummary() {
-      const container = document.getElementById('hot-times-summary');
-      if (!bestTimesData) { container.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
-
+      const c = document.getElementById('hot-times-summary');
+      if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
       const today = new Date().getDay();
-      let hasAnyHot = false;
-      let html = '<div class="hot-times-grid">';
+      let hasAny = false, html = '<div class="hot-times-grid">';
       for (let d = 0; d < 7; d++) {
         const isToday = d === today;
-        const todayCls = isToday ? ' hot-day-col-today' : '';
-        const headerLabel = isToday ? `${DOW_SHORT[d]} (today)` : DOW_SHORT[d];
-        html += `<div class="hot-day-col${todayCls}"><div class="day-header">${headerLabel}</div>`;
-        const hourData = bestTimesData[d];
-        let dayHasHot = false, dayHasAnyData = false;
-        const hours = Object.keys(hourData).map(Number).sort((a, b) => a - b);
-        for (const hour of hours) {
-          const vals = hourData[hour];
-          if (vals.length === 0) continue;
-          dayHasAnyData = true;
-          const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+        html += `<div class="hot-day-col${isToday?' hot-day-col-today':''}"><div class="day-header">${isToday?DOW_SHORT[d]+' (today)':DOW_SHORT[d]}</div>`;
+        const hd = bestTimesData[d]; let dayHot = false, dayData = false;
+        for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
+          const v = hd[hour]; if (!v.length) continue; dayData = true;
+          const avg = v.reduce((a,b)=>a+b,0)/v.length;
           if (avg >= 4) {
-            const label = new Date(2026, 0, 1, hour).toLocaleTimeString('en-US', { hour: 'numeric' });
-            html += `<div class="hot-time">${label}<br><span style="font-size:0.7rem;opacity:0.7">${avg.toFixed(1)} avg</span></div>`;
-            dayHasHot = true;
-            hasAnyHot = true;
+            const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
+            // Heat map opacity based on avg (4=60%, 5=80%, 6=100%)
+            const intensity = Math.min((avg - 3) / 3, 1);
+            html += `<div class="hot-time" style="background:rgba(232,93,38,${0.08 + intensity * 0.15}); color:var(--active); border-left:3px solid var(--active)">${lbl}<br><span style="font-size:0.7rem;opacity:0.7">${avg.toFixed(1)} avg</span></div>`;
+            dayHot = true; hasAny = true;
           }
         }
-        if (!dayHasHot) html += `<div class="no-hot">${dayHasAnyData ? 'Typically quiet' : 'Not yet tracked'}</div>`;
+        if (!dayHot) html += `<div class="no-hot">${dayData?'--':'Not yet tracked'}</div>`;
         html += '</div>';
       }
       html += '</div>';
-
-      if (!hasAnyHot) { container.innerHTML = '<div class="no-data-msg">No consistently busy times found yet — more data needed.</div>'; return; }
-      container.innerHTML = html;
+      if (!hasAny) { c.innerHTML = '<div class="no-data-msg">No consistently busy times found yet -- more data needed.</div>'; return; }
+      c.innerHTML = html;
     }
 
     function renderBestTimes(dow) {
-      const container = document.getElementById('best-times');
-      if (!bestTimesData) { container.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
-
-      const hourData = bestTimesData[dow];
-      const entries = Object.entries(hourData)
-        .filter(([_, vals]) => vals.length > 0)
-        .map(([hour, vals]) => ({
-          hour: parseInt(hour),
-          avg: vals.reduce((a, b) => a + b, 0) / vals.length,
-          samples: vals.length,
-        }));
-
-      if (entries.length === 0) {
-        container.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet — check back after a ${DOW_NAMES[dow]} has been tracked.</div>`;
-        return;
-      }
-
-      container.innerHTML = entries.map(({ hour, avg, samples }) => {
-        const label = new Date(2026, 0, 1, hour).toLocaleTimeString('en-US', { hour: 'numeric' });
-        let cls = avg >= 4 ? 'time-hot' : avg >= 2 ? 'time-warm' : 'time-cold';
-        return `<div class="time-slot ${cls}"><strong>${label}</strong><br>${avg.toFixed(1)} avg in use<br><span style="font-size:0.75rem;opacity:0.7">${samples} sample${samples !== 1 ? 's' : ''}</span></div>`;
+      const c = document.getElementById('best-times');
+      if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
+      const hd = bestTimesData[dow];
+      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:v.reduce((a,b)=>a+b,0)/v.length,samples:v.length}));
+      if (!entries.length) { c.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet.</div>`; return; }
+      c.innerHTML = entries.map(({hour,avg,samples})=>{
+        const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
+        const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
+        return `<div class="time-slot ${cls}"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg in use<br><span style="font-size:0.75rem;opacity:0.7">${samples} sample${samples!==1?'s':''}</span></div>`;
       }).join('');
     }
 
     function buildDayPicker(index, onSelect) {
       const picker = document.getElementById('day-picker');
       const dates = index.dates.slice(0, 7);
-      if (dates.length === 0) return;
-
-      picker.innerHTML = dates.map((d, i) => {
-        const dt = new Date(d + 'T12:00:00');
-        const label = i === 0 ? 'Today' : dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        return `<button class="day-btn ${i === 0 ? 'active' : ''}" data-date="${d}">${label}</button>`;
+      if (!dates.length) return;
+      picker.innerHTML = dates.map((d,i) => {
+        const dt = new Date(d+'T12:00:00');
+        const lbl = i===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+        return `<button class="day-btn ${i===0?'active':''}" data-date="${d}">${lbl}</button>`;
       }).join('');
-
-      picker.querySelectorAll('.day-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          picker.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          onSelect(btn.dataset.date);
-        });
-      });
+      picker.querySelectorAll('.day-btn').forEach(b => b.addEventListener('click', () => {
+        picker.querySelectorAll('.day-btn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active'); onSelect(b.dataset.date);
+      }));
     }
 
     let currentChartDate = null;
-
     async function init() {
       const index = await loadIndex();
       if (index.dates.length > 0) {
@@ -899,16 +592,9 @@
         const todayData = await loadDay(index.dates[0]);
         updateCurrentStatus(todayData);
         renderChart(todayData);
-        buildDayPicker(index, async (dateStr) => {
-          currentChartDate = dateStr;
-          const data = await loadDay(dateStr);
-          renderChart(data);
-          if (dateStr === index.dates[0]) updateCurrentStatus(data);
-        });
+        buildDayPicker(index, async (d) => { currentChartDate=d; const data=await loadDay(d); renderChart(data); if(d===index.dates[0]) updateCurrentStatus(data); });
         computeBestTimes(index);
-      } else {
-        updateCurrentStatus([]);
-      }
+      } else { updateCurrentStatus([]); }
     }
 
     async function autoRefresh() {
@@ -916,16 +602,15 @@
       try {
         const index = await loadIndex();
         if (index.dates.length > 0) {
-          const todayDate = index.dates[0];
-          const todayData = await loadDay(todayDate);
-          updateCurrentStatus(todayData);
-          if (currentChartDate === todayDate) renderChart(todayData);
+          const td = index.dates[0], data = await loadDay(td);
+          updateCurrentStatus(data);
+          if (currentChartDate === td) renderChart(data);
         }
       } catch {}
     }
 
     init();
-    setInterval(autoRefresh, 600000);
+    setInterval(autoRefresh, 300000); // 5 minutes
   </script>
 </body>
 </html>
