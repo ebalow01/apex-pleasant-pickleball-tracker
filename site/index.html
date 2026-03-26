@@ -397,11 +397,6 @@
 
     <div id="courts-grid" class="courts-grid"></div>
 
-    <div class="section live-image">
-      <h2>Live Camera View</h2>
-      <img id="live-img" src="" alt="Court status camera" loading="lazy">
-    </div>
-
     <div class="section">
       <div class="meta-row">
         <h2>Today's Activity</h2>
@@ -475,12 +470,6 @@
       applyTheme(next);
     });
 
-    // Refresh live camera image
-    function refreshLiveImage() {
-      const img = document.getElementById('live-img');
-      img.src = `https://cvsi-alpha.io.parquery.com/o/panel/apexpickleball-2.jpg?ts=${Date.now()}`;
-    }
-
     // Load data index
     async function loadIndex() {
       try {
@@ -521,13 +510,13 @@
       const timeStr = ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
       if (occupied >= 4) {
-        banner.innerHTML = `Good time to play! ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}</span>`;
+        banner.innerHTML = `Good time to play! ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-good';
       } else if (occupied >= 2) {
-        banner.innerHTML = `Moderate activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}</span>`;
+        banner.innerHTML = `Moderate activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-moderate';
       } else {
-        banner.innerHTML = `Low activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}</span>`;
+        banner.innerHTML = `Low activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-low';
       }
 
@@ -755,9 +744,6 @@
 
     // Main init
     async function init() {
-      refreshLiveImage();
-      setInterval(refreshLiveImage, 60000); // Refresh image every minute
-
       const index = await loadIndex();
 
       if (index.dates.length > 0) {
