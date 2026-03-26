@@ -109,10 +109,38 @@
     .icon-sm { width: 16px; height: 16px; }
     .icon-md { width: 20px; height: 20px; vertical-align: -0.2em; margin-right: 0.35rem; }
 
-    header {
-      text-align: center;
+    .hero-banner {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
       margin-bottom: 2rem;
+      padding: 3rem 1.5rem 2.5rem;
+      text-align: center;
     }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('./images/hero-paddle.jpg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: 0;
+    }
+
+    [data-theme="dark"] .hero-banner::before { opacity: 0.1; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero-banner::before { opacity: 0.1; } }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, var(--bg) 100%);
+      z-index: 0;
+    }
+
+    .hero-banner > * { position: relative; z-index: 1; }
 
     .header-lockup {
       display: inline-flex;
@@ -123,13 +151,13 @@
 
     .header-logo { color: var(--accent); flex-shrink: 0; }
 
-    header h1 {
-      font-size: 1.75rem;
+    .hero-banner h1 {
+      font-size: 2rem;
       font-weight: 700;
       letter-spacing: -0.02em;
     }
 
-    header p {
+    .hero-banner p {
       color: var(--text-muted);
       font-size: 0.9rem;
       display: flex;
@@ -138,8 +166,7 @@
       gap: 0.35rem;
     }
 
-    header::after {
-      content: '';
+    .hero-banner .brand-bar {
       display: block;
       width: 60px;
       height: 3px;
@@ -444,9 +471,9 @@
         <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       </svg>
     </button>
-    <header>
+    <div class="hero-banner">
       <div class="header-lockup">
-        <svg class="header-logo" viewBox="0 0 64 64" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="header-logo" viewBox="0 0 64 64" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="16" y="4" width="26" height="32" rx="13" fill="currentColor" opacity="0.9"/>
           <rect x="25" y="34" width="8" height="16" rx="2" fill="currentColor" opacity="0.9"/>
           <line x1="27" y1="38" x2="33" y2="38" stroke="var(--bg)" stroke-width="1.5" opacity="0.5"/>
@@ -462,7 +489,8 @@
         <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Court availability tracker &middot; Apex, NC
       </p>
-    </header>
+      <span class="brand-bar"></span>
+    </div>
 
     <div class="section">
       <h2>
