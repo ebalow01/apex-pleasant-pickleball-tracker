@@ -620,6 +620,7 @@
         const dow = dateObj.getDay();
 
         for (const r of dayData) {
+          if (r.occupied_count === 0) continue; // Skip zero readings (darkness, rain, etc.)
           const hour = new Date(r.timestamp).getHours();
           if (bestTimesData[dow][hour] !== undefined) {
             bestTimesData[dow][hour].push(r.occupied_count);
