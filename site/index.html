@@ -291,6 +291,27 @@
       color: var(--text-muted);
     }
 
+    .hot-time-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--green);
+      font-size: 0.9rem;
+    }
+
+    .hot-time-row strong {
+      min-width: 90px;
+    }
+
+    .hot-times-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
     .no-data-msg {
       color: var(--text-muted);
       font-size: 0.85rem;
@@ -368,12 +389,16 @@
     <div class="section">
       <h2>Best Times to Play (based on history)</h2>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
-        Green = usually 4+ courts in use (good for pickup games)
+        Times when 4+ courts are typically in use (good for pickup games)
       </p>
-      <div class="best-times-week">
-        <div id="dow-picker" class="dow-picker"></div>
-        <div id="best-times" class="best-times-grid">
-          <div class="loading">Collecting data...</div>
+      <div id="hot-times-summary" class="best-times-grid" style="margin-bottom: 1rem;">
+        <div class="loading">Collecting data...</div>
+      </div>
+      <button id="detail-toggle" class="day-btn" style="margin-bottom: 0.75rem; display: none;">Show daily breakdown</button>
+      <div id="daily-detail" style="display: none;">
+        <div class="best-times-week">
+          <div id="dow-picker" class="dow-picker"></div>
+          <div id="best-times" class="best-times-grid"></div>
         </div>
       </div>
     </div>
@@ -576,6 +601,9 @@
         }
       }
 
+      // Render the green summary (all days with 4+ avg)
+      renderHotTimesSummary();
+
       // Build day-of-week picker
       const picker = document.getElementById('dow-picker');
       const today = new Date().getDay();
@@ -591,8 +619,69 @@
         });
       });
 
-      // Show today's day by default
       renderBestTimes(today);
+
+      // Wire up toggle
+      const toggleBtn = document.getElementById('detail-toggle');
+      const detailDiv = document.getElementById('daily-detail');
+      toggleBtn.style.display = 'inline-block';
+      toggleBtn.addEventListener('click', () => {
+        const showing = detailDiv.style.display !== 'none';
+        detailDiv.style.display = showing ? 'none' : 'block';
+        toggleBtn.textContent = showing ? 'Show daily breakdown' : 'Hide daily breakdown';
+      });
+    }
+
+    function renderHotTimesSummary() {
+      const container = document.getElementById('hot-times-summary');
+      if (!bestTimesData) {
+        container.innerHTML = '<div class="no-data-msg">Collecting data...</div>';
+        return;
+      }
+
+      // Collect all green (avg >= 4) slots across all days
+      const hotSlots = [];
+      for (let d = 0; d < 7; d++) {
+        const hourData = bestTimesData[d];
+        for (const [hour, vals] of Object.entries(hourData)) {
+          if (vals.length === 0) continue;
+          const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+          if (avg >= 4) {
+            hotSlots.push({
+              dow: d,
+              hour: parseInt(hour),
+              avg,
+              samples: vals.length,
+            });
+          }
+        }
+      }
+
+      if (hotSlots.length === 0) {
+        container.innerHTML = '<div class="no-data-msg">No consistently busy times found yet — more data needed.</div>';
+        return;
+      }
+
+      // Sort by day of week, then hour
+      hotSlots.sort((a, b) => a.dow - b.dow || a.hour - b.hour);
+
+      // Group by day
+      const grouped = {};
+      for (const slot of hotSlots) {
+        if (!grouped[slot.dow]) grouped[slot.dow] = [];
+        grouped[slot.dow].push(slot);
+      }
+
+      let html = '<div class="hot-times-list">';
+      for (const [dow, slots] of Object.entries(grouped)) {
+        const times = slots.map(s => {
+          const label = new Date(2026, 0, 1, s.hour).toLocaleTimeString('en-US', { hour: 'numeric' });
+          return `${label} (${s.avg.toFixed(1)})`;
+        }).join(', ');
+        html += `<div class="hot-time-row"><strong>${DOW_NAMES[parseInt(dow)]}</strong><span>${times}</span></div>`;
+      }
+      html += '</div>';
+      container.innerHTML = html;
     }
 
     function renderBestTimes(dow) {
