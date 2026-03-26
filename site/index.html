@@ -341,14 +341,35 @@
       const headline = banner.querySelector('.vibe-headline');
       const text = headline ? `Pleasant Park Pickleball -- ${headline.textContent}` : 'Pleasant Park Pickleball -- check the courts!';
       const url = window.location.href;
+      const shareText = `${text}\n${url}`;
+
       if (navigator.share) {
-        try { await navigator.share({ title: 'Pleasant Park Pickleball', text, url }); } catch {}
-      } else {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        const btn = document.getElementById('share-btn');
-        btn.style.color = 'var(--active)';
-        setTimeout(() => btn.style.color = '', 1500);
+        try { await navigator.share({ title: 'Pleasant Park Pickleball', text, url }); return; } catch {}
       }
+
+      // Clipboard fallback with visible feedback
+      try {
+        await navigator.clipboard.writeText(shareText);
+      } catch {
+        // Final fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = shareText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+
+      // Show "Copied!" toast
+      const btn = document.getElementById('share-btn');
+      const toast = document.createElement('div');
+      toast.textContent = 'Link copied!';
+      toast.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;z-index:999;animation:fadeSlideUp 0.3s ease-out';
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 1500);
+      setTimeout(() => toast.remove(), 1800);
     });
 
     // Data
