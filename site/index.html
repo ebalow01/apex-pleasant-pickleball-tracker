@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pleasant Park Pickleball - Court Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   <style>
     :root {
       --bg: #f8fafc;
@@ -338,6 +339,22 @@
       font-style: italic;
     }
 
+    .hot-day-col-today {
+      background: rgba(59, 130, 246, 0.08);
+      border-radius: 6px;
+      padding: 0.25rem;
+    }
+
+    .hot-day-col-today .day-header {
+      color: var(--blue);
+    }
+
+    .trend-indicator {
+      font-size: 0.85rem;
+      font-weight: normal;
+      opacity: 0.85;
+    }
+
     .no-data-msg {
       color: var(--text-muted);
       font-size: 0.85rem;
@@ -492,10 +509,36 @@
       }
     }
 
+    // Compute trend from recent readings
+    function getTrend(readings) {
+      if (readings.length < 3) return '';
+      const recent = readings.slice(-3).map(r => r.occupied_count);
+      const first = recent[0];
+      const last = recent[recent.length - 1];
+      if (last > first) return ' <span class="trend-indicator">-- trending up</span>';
+      if (last < first) return ' <span class="trend-indicator">-- winding down</span>';
+      return ' <span class="trend-indicator">-- holding steady</span>';
+    }
+
+    // Check if we're outside polling hours
+    function isOffHours() {
+      const now = new Date();
+      const hour = now.getHours();
+      return hour < 5 || hour >= 22;
+    }
+
     // Update the status banner and court cards
     function updateCurrentStatus(readings) {
       const banner = document.getElementById('status-banner');
       const grid = document.getElementById('courts-grid');
+
+      // Off-hours check
+      if (isOffHours()) {
+        banner.innerHTML = 'Courts are closed — tracking resumes at 5 AM';
+        banner.className = 'status-banner status-unknown';
+        grid.innerHTML = '';
+        return;
+      }
 
       if (!readings || readings.length === 0) {
         banner.textContent = 'No data yet — check back after the first poll runs';
@@ -509,14 +552,19 @@
       const ts = new Date(latest.timestamp);
       const timeStr = ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
+      // Check if data is stale (> 30 min old)
+      const ageMin = (Date.now() - ts.getTime()) / 60000;
+      const staleNote = ageMin > 30 ? ' (data may be stale)' : '';
+      const trend = getTrend(readings);
+
       if (occupied >= 4) {
-        banner.innerHTML = `Good time to play! ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
+        banner.innerHTML = `Good time to play! ${occupied}/6 courts in use${trend}<span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}${staleNote} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-good';
       } else if (occupied >= 2) {
-        banner.innerHTML = `Moderate activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
+        banner.innerHTML = `Moderate activity: ${occupied}/6 courts in use${trend}<span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}${staleNote} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-moderate';
       } else {
-        banner.innerHTML = `Low activity: ${occupied}/6 courts in use <span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr} (updates every 15 min)</span>`;
+        banner.innerHTML = `Low activity: ${occupied}/6 courts in use${trend}<span style="font-size:0.8rem;display:block;font-weight:normal;margin-top:4px">as of ${timeStr}${staleNote} (updates every 15 min)</span>`;
         banner.className = 'status-banner status-low';
       }
 
@@ -568,6 +616,27 @@
           maintainAspectRatio: false,
           plugins: {
             legend: { labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--chart-legend').trim() } },
+            annotation: {
+              annotations: {
+                threshold: {
+                  type: 'line',
+                  yMin: 4,
+                  yMax: 4,
+                  borderColor: 'rgba(34, 197, 94, 0.6)',
+                  borderWidth: 2,
+                  borderDash: [6, 4],
+                  label: {
+                    display: true,
+                    content: 'Open play (4+)',
+                    position: 'start',
+                    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                    color: getComputedStyle(document.documentElement).getPropertyValue('--green').trim(),
+                    font: { size: 11 },
+                    padding: 3,
+                  },
+                },
+              },
+            },
           },
           scales: {
             x: {
@@ -656,17 +725,23 @@
       }
 
       // Build columns for each day of week
+      const today = new Date().getDay();
       let hasAnyHot = false;
       let html = '<div class="hot-times-grid">';
       for (let d = 0; d < 7; d++) {
-        html += `<div class="hot-day-col"><div class="day-header">${DOW_SHORT[d]}</div>`;
+        const isToday = d === today;
+        const todayCls = isToday ? ' hot-day-col-today' : '';
+        const headerLabel = isToday ? `${DOW_SHORT[d]} (today)` : DOW_SHORT[d];
+        html += `<div class="hot-day-col${todayCls}"><div class="day-header">${headerLabel}</div>`;
         const hourData = bestTimesData[d];
         let dayHasHot = false;
+        let dayHasAnyData = false;
         // Sort hours and render green ones
         const hours = Object.keys(hourData).map(Number).sort((a, b) => a - b);
         for (const hour of hours) {
           const vals = hourData[hour];
           if (vals.length === 0) continue;
+          dayHasAnyData = true;
           const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
           if (avg >= 4) {
             const label = new Date(2026, 0, 1, hour).toLocaleTimeString('en-US', { hour: 'numeric' });
@@ -676,7 +751,7 @@
           }
         }
         if (!dayHasHot) {
-          html += `<div class="no-hot">no data</div>`;
+          html += `<div class="no-hot">${dayHasAnyData ? 'Typically quiet' : 'Not yet tracked'}</div>`;
         }
         html += '</div>';
       }
@@ -742,15 +817,20 @@
       });
     }
 
+    // Track which date the chart is currently showing
+    let currentChartDate = null;
+
     // Main init
     async function init() {
       const index = await loadIndex();
 
       if (index.dates.length > 0) {
+        currentChartDate = index.dates[0];
         const todayData = await loadDay(index.dates[0]);
         updateCurrentStatus(todayData);
         renderChart(todayData);
         buildDayPicker(index, async (dateStr) => {
+          currentChartDate = dateStr;
           const data = await loadDay(dateStr);
           renderChart(data);
           if (dateStr === index.dates[0]) updateCurrentStatus(data);
@@ -761,7 +841,27 @@
       }
     }
 
+    // Auto-refresh current data every 10 minutes
+    async function autoRefresh() {
+      if (document.visibilityState === 'hidden') return;
+      try {
+        const index = await loadIndex();
+        if (index.dates.length > 0) {
+          const todayDate = index.dates[0];
+          const todayData = await loadDay(todayDate);
+          updateCurrentStatus(todayData);
+          // Only refresh chart if viewing today
+          if (currentChartDate === todayDate) {
+            renderChart(todayData);
+          }
+        }
+      } catch {
+        // Silently fail on auto-refresh
+      }
+    }
+
     init();
+    setInterval(autoRefresh, 600000); // 10 minutes
   </script>
 </body>
 </html>
