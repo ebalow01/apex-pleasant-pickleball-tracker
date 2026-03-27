@@ -5,79 +5,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pleasant Park Pickleball - Court Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   <style>
     :root {
-      --bg: #f5f7f3;
+      --bg: #f8faf6;
       --surface: #ffffff;
-      --border: #d4ddd0;
+      --surface-raised: #ffffff;
+      --border: #e2e8de;
+      --border-subtle: #eef2eb;
       --text: #1a2e1a;
-      --text-muted: #5e7a5e;
+      --text-secondary: #3d5a3d;
+      --text-muted: #6b8a6b;
       --accent: #2d6a4f;
       --accent-light: #40916c;
+      --accent-glow: rgba(45, 106, 79, 0.12);
       --green: #2d6a4f;
-      --active: #e85d26;
-      --active-light: rgba(232,93,38,0.12);
-      --yellow: #b7791f;
-      --chart-grid: rgba(93,122,93,0.15);
-      --chart-tick: #5e7a5e;
-      --chart-legend: #5e7a5e;
-      --vibe-hot-bg: linear-gradient(135deg, #fff7ed, #fed7aa);
-      --vibe-hot-text: #7c2d12;
-      --vibe-warm-bg: var(--surface);
-      --vibe-warm-text: var(--text);
-      --vibe-chill-bg: var(--surface);
-      --vibe-chill-text: var(--text-muted);
-    }
-
-    [data-theme="dark"] {
-      --bg: #0d1b0d;
-      --surface: #1a2e1a;
-      --border: #2a3d2a;
-      --text: #d4e8d4;
-      --text-muted: #7fa37f;
-      --accent: #52b788;
-      --accent-light: #74c69d;
-      --green: #52b788;
-      --active: #f59e0b;
-      --active-light: rgba(245,158,11,0.15);
-      --yellow: #f0c040;
-      --chart-grid: rgba(127,163,127,0.2);
-      --chart-tick: #7fa37f;
-      --chart-legend: #7fa37f;
-      --vibe-hot-bg: linear-gradient(135deg, #451a03, #78350f);
-      --vibe-hot-text: #fef3c7;
-      --vibe-warm-bg: var(--surface);
-      --vibe-warm-text: var(--text);
-      --vibe-chill-bg: var(--surface);
-      --vibe-chill-text: var(--text-muted);
+      --green-soft: rgba(45,106,79,0.08);
+      --hot: #e85d26;
+      --hot-soft: rgba(232,93,38,0.08);
+      --hot-glow: rgba(232,93,38,0.2);
+      --warm: #d97706;
+      --warm-soft: rgba(217,119,6,0.08);
+      --chill: #94a3b8;
+      --chart-grid: rgba(93,122,93,0.1);
+      --chart-tick: #6b8a6b;
+      --chart-legend: #6b8a6b;
+      --shadow-sm: 0 1px 3px rgba(26,46,26,0.06);
+      --shadow-md: 0 4px 12px rgba(26,46,26,0.08);
+      --shadow-lg: 0 8px 24px rgba(26,46,26,0.1);
+      --radius: 16px;
+      --radius-sm: 10px;
     }
 
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --bg: #0d1b0d;
-        --surface: #1a2e1a;
+        --surface: #162416;
+        --surface-raised: #1c2e1c;
         --border: #2a3d2a;
+        --border-subtle: #223322;
         --text: #d4e8d4;
+        --text-secondary: #a3c4a3;
         --text-muted: #7fa37f;
         --accent: #52b788;
         --accent-light: #74c69d;
+        --accent-glow: rgba(82,183,136,0.15);
         --green: #52b788;
-        --active: #f59e0b;
-        --active-light: rgba(245,158,11,0.15);
-        --yellow: #f0c040;
-        --chart-grid: rgba(127,163,127,0.2);
+        --green-soft: rgba(82,183,136,0.1);
+        --hot: #fb923c;
+        --hot-soft: rgba(251,146,60,0.12);
+        --hot-glow: rgba(251,146,60,0.25);
+        --warm: #fbbf24;
+        --warm-soft: rgba(251,191,36,0.1);
+        --chill: #64748b;
+        --chart-grid: rgba(127,163,127,0.15);
         --chart-tick: #7fa37f;
         --chart-legend: #7fa37f;
-        --vibe-hot-bg: linear-gradient(135deg, #451a03, #78350f);
-        --vibe-hot-text: #fef3c7;
-        --vibe-warm-bg: var(--surface);
-        --vibe-warm-text: var(--text);
-        --vibe-chill-bg: var(--surface);
-        --vibe-chill-text: var(--text-muted);
+        --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
       }
+    }
+
+    [data-theme="dark"] {
+      --bg: #0d1b0d;
+      --surface: #162416;
+      --surface-raised: #1c2e1c;
+      --border: #2a3d2a;
+      --border-subtle: #223322;
+      --text: #d4e8d4;
+      --text-secondary: #a3c4a3;
+      --text-muted: #7fa37f;
+      --accent: #52b788;
+      --accent-light: #74c69d;
+      --accent-glow: rgba(82,183,136,0.15);
+      --green: #52b788;
+      --green-soft: rgba(82,183,136,0.1);
+      --hot: #fb923c;
+      --hot-soft: rgba(251,146,60,0.12);
+      --hot-glow: rgba(251,146,60,0.25);
+      --warm: #fbbf24;
+      --warm-soft: rgba(251,191,36,0.1);
+      --chill: #64748b;
+      --chart-grid: rgba(127,163,127,0.15);
+      --chart-tick: #7fa37f;
+      --chart-legend: #7fa37f;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -87,199 +104,326 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.344 0L13.858 8.485 15.272 9.9l9.9-9.9h-2.828zM32 0l-3.486 3.485-1.414-1.414L30.172 0H32z' fill='%235e7a5e' fill-opacity='0.02'/%3E%3C/svg%3E");
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container { max-width: 1100px; margin: 0 auto; padding: 0.75rem; position: relative; }
-    @media (min-width: 768px) { .container { padding: 1.25rem; } }
+    .container { max-width: 680px; margin: 0 auto; padding: 0.75rem; }
+    @media (min-width: 768px) { .container { padding: 1.5rem; } }
 
     .icon { width: 1em; height: 1em; vertical-align: -0.125em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
     .icon-sm { width: 16px; height: 16px; }
-    .icon-md { width: 20px; height: 20px; vertical-align: -0.2em; margin-right: 0.35rem; }
 
-    /* Hero banner - fused with vibe check */
-    .hero-banner { position: relative; border-radius: 16px 16px 0 0; overflow: hidden; margin-bottom: 0; padding: 1.25rem 1rem 0.5rem; text-align: center; }
-    .hero-banner::before { content: ''; position: absolute; inset: 0; background-image: url('./images/hero-paddle.jpg'); background-size: cover; background-position: center; opacity: 0.35; z-index: 0; }
-    [data-theme="dark"] .hero-banner::before { opacity: 0.2; }
-    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hero-banner::before { opacity: 0.2; } }
-    .hero-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0%, var(--bg) 100%); z-index: 0; }
-    .hero-banner > * { position: relative; z-index: 1; }
-    .header-lockup { display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
-    .header-logo { color: var(--accent); flex-shrink: 0; }
-    .hero-banner h1 { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; }
-    @media (min-width: 768px) { .hero-banner h1 { font-size: 2rem; } }
-    .hero-banner p { color: var(--text-muted); font-size: 0.85rem; display: none; align-items: center; justify-content: center; gap: 0.35rem; letter-spacing: 0.02em; text-transform: uppercase; }
-    @media (min-width: 768px) { .hero-banner p { display: flex; } }
-    .hero-banner .brand-bar { display: none; }
-    @media (min-width: 768px) { .hero-banner .brand-bar { display: block; width: 80px; height: 4px; background: var(--accent); border-radius: 2px; margin: 0.5rem auto 0; } }
+    /* ========= HEADER ========= */
+    .site-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.5rem 0; margin-bottom: 0.75rem;
+    }
+    .site-header .brand {
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .site-header .brand-icon {
+      width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;
+    }
+    .site-header .brand-text h1 {
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 800;
+      letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .site-header .brand-text p {
+      font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.02em;
+    }
+    .icon-btn {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
+      width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* Vibe check status banner - fused with hero */
-    .vibe-banner { border-radius: 0 0 14px 14px; margin-bottom: 0.75rem; padding: 1rem; border: 1px solid var(--border); border-top: none; text-align: center; transition: background 0.4s ease, border-color 0.4s ease; }
-    .vibe-banner .vibe-count { font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; display: inline; }
-    .vibe-banner .vibe-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; display: inline; margin-left: 0.35rem; }
-    .vibe-banner .vibe-headline { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; margin-top: 0.25rem; }
-    .vibe-banner .vibe-sub { font-size: 0.85rem; font-weight: 400; margin-top: 0.15rem; opacity: 0.8; }
-    .vibe-banner .vibe-meta { font-size: 0.7rem; opacity: 0.5; margin-top: 0.25rem; }
-
-    @keyframes pulse-glow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 24px rgba(232, 93, 38, 0.3); } }
-    .vibe-hot .vibe-count { color: var(--active); animation: pulse-glow 2s ease-in-out infinite; }
-    .vibe-hot { background: var(--vibe-hot-bg); border-color: var(--active); color: var(--vibe-hot-text); }
-    .vibe-warm { background: var(--vibe-warm-bg); border-color: var(--accent); color: var(--vibe-warm-text); }
-    .vibe-warm .vibe-count { color: var(--accent); }
-    .vibe-chill { background: var(--vibe-chill-bg); border-color: var(--border); color: var(--vibe-chill-text); }
-    .vibe-chill .vibe-count { color: var(--text-muted); }
-    .vibe-closed { background: var(--surface); border-color: var(--border); color: var(--text-muted); }
-
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
-    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s ease-in-out infinite; margin-right: 4px; vertical-align: middle; }
-
-    /* Court strip */
-    .court-strip { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
-    .court-strip-label { text-align: center; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-
-    .court-cell { flex: 1; max-width: 140px; aspect-ratio: 2/3; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; transition: transform 0.15s ease; gap: 0.25rem; }
-    .court-cell::before { content: ''; position: absolute; left: 20%; right: 20%; top: 50%; border-top: 1px dashed var(--border); opacity: 0.5; }
-    .court-cell:hover { transform: translateY(-2px); }
-
-    .court-cell-active { background: var(--active-light); border: 2px solid var(--active); }
-    .court-cell-active .court-cell-num { color: var(--active); }
-    .court-cell-active .court-cell-status { color: var(--active); font-weight: 600; }
-
-    .court-cell-open { background: transparent; border: 2px dashed var(--border); }
-    .court-cell-open .court-cell-num { color: var(--text-muted); }
-    .court-cell-open .court-cell-status { color: var(--text-muted); }
-
-    .court-cell-num { font-family: 'Outfit', sans-serif; font-size: 1.75rem; font-weight: 700; line-height: 1; position: relative; z-index: 1; }
-    .court-cell-status { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; position: relative; z-index: 1; }
-
-    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .court-cell { animation: fadeSlideUp 0.3s ease-out both; }
-    .court-cell:nth-child(1) { animation-delay: 0s; }
-    .court-cell:nth-child(2) { animation-delay: 0.04s; }
-    .court-cell:nth-child(3) { animation-delay: 0.08s; }
-    .court-cell:nth-child(4) { animation-delay: 0.12s; }
-    .court-cell:nth-child(5) { animation-delay: 0.16s; }
-    .court-cell:nth-child(6) { animation-delay: 0.2s; }
-
-    @media (max-width: 500px) {
-      .court-strip { flex-wrap: wrap; }
-      .court-cell { flex: 0 0 calc(33.33% - 0.35rem); max-width: none; }
+    /* ========= VIBE CARD - The main attraction ========= */
+    .vibe-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1.25rem;
+      margin-bottom: 0.75rem; text-align: center;
+      box-shadow: var(--shadow-sm); transition: all 0.4s ease;
+      position: relative; overflow: hidden;
     }
 
-    /* Sections */
-    .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem; margin-bottom: 0.75rem; }
-    @media (min-width: 768px) { .section { padding: 1.25rem; margin-bottom: 1rem; } }
-    .section h2 { font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; display: flex; align-items: center; }
-    .meta-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
-    .day-picker { display: flex; gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-    .day-picker::-webkit-scrollbar { display: none; }
-    .day-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.35rem 0.75rem; min-height: 36px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-family: inherit; white-space: nowrap; display: inline-flex; align-items: center; }
-    .day-btn:hover { border-color: var(--accent-light); }
-    .day-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .vibe-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.4s;
+    }
+
+    .vibe-card .verdict {
+      font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      padding: 0.3rem 0.75rem; border-radius: 100px; display: inline-block;
+      margin-bottom: 0.75rem; position: relative;
+    }
+
+    .vibe-card .big-number {
+      font-family: 'Outfit', sans-serif; font-size: 4rem; font-weight: 900;
+      line-height: 1; letter-spacing: -0.04em; position: relative;
+    }
+    .vibe-card .big-number small {
+      font-size: 1.5rem; font-weight: 600; opacity: 0.5;
+    }
+
+    .vibe-card .headline {
+      font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700;
+      margin-top: 0.25rem; position: relative;
+    }
+    .vibe-card .subline {
+      font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.15rem;
+      position: relative;
+    }
+    .vibe-card .meta {
+      font-size: 0.7rem; color: var(--text-muted); margin-top: 0.75rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      position: relative;
+    }
+    .vibe-card .trend { font-size: 0.8rem; position: relative; }
+
+    /* Vibe states */
+    .vibe-card.state-hot {
+      border-color: var(--hot);
+      box-shadow: 0 0 0 1px var(--hot), 0 4px 24px var(--hot-glow), inset 0 1px 0 var(--hot-soft);
+      background: linear-gradient(180deg, var(--hot-soft) 0%, var(--surface) 40%);
+    }
+    .vibe-card.state-hot::before { opacity: 1; background: radial-gradient(ellipse at 50% 0%, var(--hot-glow) 0%, transparent 60%); }
+    .vibe-card.state-hot .verdict { background: var(--hot-soft); color: var(--hot); }
+    .vibe-card.state-hot .big-number { color: var(--hot); }
+    @keyframes pulse-glow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 30px var(--hot-glow); } }
+    .vibe-card.state-hot .big-number { animation: pulse-glow 2s ease-in-out infinite; }
+
+    .vibe-card.state-warm .verdict { background: var(--warm-soft); color: var(--warm); }
+    .vibe-card.state-warm .big-number { color: var(--warm); }
+    .vibe-card.state-warm { border-color: var(--warm); }
+    .vibe-card.state-warm::before { opacity: 0.5; background: radial-gradient(ellipse at 50% 0%, var(--warm-soft) 0%, transparent 70%); }
+
+    .vibe-card.state-chill .verdict { background: var(--green-soft); color: var(--accent); }
+    .vibe-card.state-chill .big-number { color: var(--accent); }
+
+    .vibe-card.state-empty .verdict { background: var(--surface-raised); color: var(--text-muted); }
+    .vibe-card.state-empty .big-number { color: var(--text-muted); }
+
+    .vibe-card.state-closed { opacity: 0.7; }
+    .vibe-card.state-closed .verdict { background: var(--surface-raised); color: var(--text-muted); }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s ease-in-out infinite; }
+
+    /* ========= COURT MINI-MAP ========= */
+    .court-map {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.35rem;
+      margin-top: 1rem; position: relative;
+    }
+    .court-pip {
+      height: 6px; border-radius: 3px; transition: all 0.3s ease;
+    }
+    .court-pip.active { background: var(--hot); }
+    .court-pip.open { background: var(--border); }
+
+    /* ========= CARDS ========= */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem; box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .card-title {
+      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .card-title .card-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+
+    /* ========= BEST TIMES ========= */
+    .peak-banner {
+      background: var(--green-soft); border: 1px solid var(--accent);
+      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .peak-banner .peak-icon {
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .peak-banner .peak-text { font-size: 0.85rem; }
+    .peak-banner .peak-text strong { color: var(--accent); }
+
+    .hot-times-grid {
+      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 0.35rem; width: 100%;
+    }
+    @media (max-width: 600px) { .hot-times-grid { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 400px) { .hot-times-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .hot-day-col { display: flex; flex-direction: column; gap: 0.25rem; }
+    .hot-day-col .day-header {
+      font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+      text-align: center; padding-bottom: 0.25rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .hot-day-col-today .day-header { color: var(--accent); font-weight: 700; }
+
+    .hot-day-col .hot-time {
+      text-align: center; padding: 0.3rem 0.15rem; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 500;
+    }
+    .hot-day-col .no-hot {
+      text-align: center; padding: 0.3rem 0.15rem; color: var(--text-muted);
+      font-size: 0.7rem; font-style: italic;
+    }
+
+    .detail-toggle {
+      background: none; border: 1px solid var(--border); color: var(--text-secondary);
+      padding: 0.4rem 0.85rem; border-radius: 100px; cursor: pointer;
+      font-size: 0.75rem; font-family: inherit; transition: all 0.2s;
+    }
+    .detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+    .best-times-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.4rem;
+    }
+    .time-slot {
+      padding: 0.5rem 0.4rem; border-radius: 8px; text-align: center; font-size: 0.8rem;
+    }
+    .time-hot { background: var(--green-soft); color: var(--green); border-left: 3px solid var(--green); }
+    .time-warm { background: rgba(45,106,79,0.04); color: var(--accent); border-left: 3px solid var(--accent); }
+    .time-cold { background: var(--surface-raised); color: var(--text-muted); border-left: 3px solid var(--border); }
+
+    /* ========= DAY/DOW PICKERS ========= */
+    .pill-picker {
+      display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto;
+      scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+    .pill-picker::-webkit-scrollbar { display: none; }
+    .pill-btn {
+      background: var(--surface-raised); border: 1px solid var(--border-subtle);
+      color: var(--text-secondary); padding: 0.3rem 0.7rem; min-height: 32px;
+      border-radius: 100px; cursor: pointer; font-size: 0.72rem; font-weight: 500;
+      font-family: inherit; white-space: nowrap; display: inline-flex;
+      align-items: center; transition: all 0.2s;
+    }
+    .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .pill-btn.active {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+      box-shadow: 0 2px 8px var(--accent-glow);
+    }
+
+    /* ========= CHART ========= */
+    .chart-label {
+      font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.35rem;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .chart-label-dot {
+      width: 8px; height: 3px; border-radius: 2px; background: var(--accent);
+    }
     .chart-container { position: relative; height: 200px; }
-    @media (min-width: 768px) { .chart-container { height: 280px; } }
+    @media (min-width: 768px) { .chart-container { height: 260px; } }
 
-    /* Best times - heat map style */
-    .best-times-week { display: flex; flex-direction: column; gap: 1rem; }
-    .dow-picker { display: flex; gap: 0.5rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 0.5rem; }
+    /* ========= DAILY BREAKDOWN ========= */
+    .daily-detail { margin-top: 0.75rem; }
+    .dow-picker { display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 0.5rem; }
     .dow-picker::-webkit-scrollbar { display: none; }
-    .dow-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 0.35rem 0.75rem; min-height: 36px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; font-family: inherit; white-space: nowrap; display: inline-flex; align-items: center; }
-    .dow-btn:hover { border-color: var(--accent-light); }
-    .dow-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    .best-times-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 0.5rem; }
-    .time-slot { padding: 0.5rem; border-radius: 6px; text-align: center; font-size: 0.85rem; }
-    .time-hot { background: rgba(45,106,79,0.1); color: var(--green); border-left: 3px solid var(--green); }
-    .time-warm { background: rgba(45,106,79,0.06); color: var(--accent); border-left: 3px solid var(--accent); }
-    .time-cold { background: rgba(0,0,0,0.02); color: var(--text-muted); border-left: 3px solid var(--border); }
-
-    .hot-times-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.5rem; width: 100%; }
-    @media (max-width: 700px) { .hot-times-grid { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 400px) { .hot-times-grid { grid-template-columns: repeat(2, 1fr); } }
-    .hot-day-col { display: flex; flex-direction: column; gap: 0.35rem; }
-    .hot-day-col .day-header { font-size: 0.8rem; font-weight: 600; color: var(--text); text-align: center; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border); }
-
-    .hot-day-col .hot-time { text-align: center; padding: 0.35rem 0.25rem; border-radius: 5px; font-size: 0.8rem; }
-    .hot-day-col .no-hot { text-align: center; padding: 0.3rem 0.25rem; color: var(--text-muted); font-size: 0.75rem; font-style: italic; }
-    .hot-day-col-today { background: rgba(45,106,79,0.06); border-radius: 6px; padding: 0.25rem; }
-    .hot-day-col-today .day-header { color: var(--accent); border-bottom-color: var(--accent); }
-
-    .trend-indicator { font-size: 0.85rem; font-weight: normal; opacity: 0.85; }
+    /* ========= UTILITY ========= */
     .no-data-msg { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem; }
     .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
 
-    footer { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.8rem; }
+    footer {
+      text-align: center; padding: 1.5rem 0.5rem 1rem;
+      color: var(--text-muted); font-size: 0.72rem; line-height: 1.5;
+      border-top: 1px solid var(--border-subtle); margin-top: 0.5rem;
+    }
     footer a { color: var(--accent); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
 
-    .top-bar { display: flex; justify-content: flex-end; gap: 0.5rem; margin-bottom: -2.5rem; position: relative; z-index: 10; }
-    .icon-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); width: 44px; height: 44px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, color 0.2s; }
-    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+    /* ========= ANIMATIONS ========= */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-in { animation: fadeIn 0.35s ease-out both; }
+    .animate-in:nth-child(2) { animation-delay: 0.06s; }
+    .animate-in:nth-child(3) { animation-delay: 0.12s; }
+    .animate-in:nth-child(4) { animation-delay: 0.16s; }
+
+    /* Court pips stagger */
+    .court-pip:nth-child(1) { animation: fadeIn 0.2s ease-out 0s both; }
+    .court-pip:nth-child(2) { animation: fadeIn 0.2s ease-out 0.03s both; }
+    .court-pip:nth-child(3) { animation: fadeIn 0.2s ease-out 0.06s both; }
+    .court-pip:nth-child(4) { animation: fadeIn 0.2s ease-out 0.09s both; }
+    .court-pip:nth-child(5) { animation: fadeIn 0.2s ease-out 0.12s both; }
+    .court-pip:nth-child(6) { animation: fadeIn 0.2s ease-out 0.15s both; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="top-bar">
-      <button class="icon-btn" id="share-btn" aria-label="Share">
-        <svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-      </button>
-    </div>
 
-    <div class="hero-banner">
-      <h1>Pleasant Park Pickleball</h1>
-      <p>
-        <svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        Live court tracker for Pleasant Park &middot; Apex, NC
-      </p>
-      <span class="brand-bar"></span>
-    </div>
-
-    <div id="vibe-banner" class="vibe-banner vibe-closed">
-      Loading...
-    </div>
-
-    <div class="section">
-      <h2>
-        <svg class="icon icon-md" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Best Times for Open Play
-      </h2>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
-        Times when 4+ courts are typically in use
-      </p>
-      <div id="hot-times-summary" style="margin-bottom: 1rem;">
-        <div class="loading">Collecting data...</div>
-      </div>
-      <button id="detail-toggle" class="day-btn" style="margin-bottom: 0.75rem; display: none;">Show daily breakdown</button>
-      <div id="daily-detail" style="display: none;">
-        <div class="best-times-week">
-          <div id="dow-picker" class="dow-picker"></div>
-          <div id="best-times" class="best-times-grid"></div>
+    <!-- Header -->
+    <header class="site-header animate-in">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="9" cy="10" r="1.2" fill="currentColor"/><circle cx="15" cy="10" r="1.2" fill="currentColor"/><circle cx="12" cy="15" r="1.2" fill="currentColor"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Pleasant Park Pickleball</h1>
+          <p>Apex, NC &middot; Live court tracker</p>
         </div>
       </div>
+      <button class="icon-btn" id="share-btn" aria-label="Share">
+        <svg class="icon" width="18" height="18" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
+    </header>
+
+    <!-- Vibe Card - THE main thing -->
+    <div id="vibe-card" class="vibe-card state-closed animate-in">
+      <div class="loading">Loading...</div>
     </div>
 
-    <div class="section">
-      <div class="meta-row">
-        <h2>
-          <svg class="icon icon-md" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Today's Action
-        </h2>
-        <div id="day-picker" class="day-picker"></div>
+    <!-- Best Times Card -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-icon" style="background: var(--green-soft); color: var(--accent);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          Best Times for Open Play
+        </div>
+        <button id="detail-toggle" class="detail-toggle" style="display: none;">Daily breakdown</button>
       </div>
+      <div id="peak-banner" style="display: none;"></div>
+      <div id="hot-times-summary">
+        <div class="loading">Collecting data...</div>
+      </div>
+      <div id="daily-detail" class="daily-detail" style="display: none;">
+        <div id="dow-picker" class="dow-picker pill-picker"></div>
+        <div id="best-times" class="best-times-grid" style="margin-top: 0.5rem;"></div>
+      </div>
+    </div>
+
+    <!-- Today's Action Chart -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-icon" style="background: var(--hot-soft); color: var(--hot);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          Today's Action
+        </div>
+        <div id="day-picker" class="pill-picker"></div>
+      </div>
+      <div class="chart-label"><span class="chart-label-dot"></span> Courts in use throughout the day</div>
       <div class="chart-container">
         <canvas id="history-chart"></canvas>
       </div>
     </div>
 
     <footer>
-      <svg class="header-logo" viewBox="0 0 64 64" width="16" height="16" fill="none" style="color: var(--text-muted); vertical-align: -0.15em; margin-right: 0.25rem;">
-        <rect x="16" y="4" width="26" height="32" rx="13" fill="currentColor" opacity="0.9"/>
-        <rect x="25" y="34" width="8" height="16" rx="2" fill="currentColor" opacity="0.9"/>
-        <circle cx="48" cy="14" r="7" fill="currentColor" opacity="0.7"/>
-        <circle cx="46" cy="12" r="1.2" fill="var(--bg)"/>
-        <circle cx="50" cy="12" r="1.2" fill="var(--bg)"/>
-        <circle cx="48" cy="16" r="1.2" fill="var(--bg)"/>
-      </svg>
       Court data pulled from <a href="https://www.apexnc.org/1163/Pleasant-Park" target="_blank">Apex Parks</a> every 15 min, dawn to dusk.
     </footer>
   </div>
@@ -292,11 +436,9 @@
       trendUp: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
       trendDown: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>',
       minus: '<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-      sun: '<svg class="icon" width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
-      moon: '<svg class="icon" width="20" height="20" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
     };
 
-    // Auto-detect theme from browser preference (no toggle)
+    // Auto-detect theme
     function applyAutoTheme() {
       const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
@@ -304,21 +446,22 @@
     applyAutoTheme();
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       applyAutoTheme();
-      if (chart) {
-        const s = getComputedStyle(document.documentElement);
-        chart.options.scales.x.ticks.color = s.getPropertyValue('--chart-tick').trim();
-        chart.options.scales.y.ticks.color = s.getPropertyValue('--chart-tick').trim();
-        chart.options.scales.x.grid.color = s.getPropertyValue('--chart-grid').trim();
-        chart.options.scales.y.grid.color = s.getPropertyValue('--chart-grid').trim();
-        chart.options.plugins.legend.labels.color = s.getPropertyValue('--chart-legend').trim();
-        chart.update();
-      }
+      if (chart) updateChartColors();
     });
+
+    function updateChartColors() {
+      const s = getComputedStyle(document.documentElement);
+      chart.options.scales.x.ticks.color = s.getPropertyValue('--chart-tick').trim();
+      chart.options.scales.y.ticks.color = s.getPropertyValue('--chart-tick').trim();
+      chart.options.scales.x.grid.color = s.getPropertyValue('--chart-grid').trim();
+      chart.options.scales.y.grid.color = s.getPropertyValue('--chart-grid').trim();
+      chart.update();
+    }
 
     // Share
     document.getElementById('share-btn').addEventListener('click', async () => {
-      const banner = document.getElementById('vibe-banner');
-      const headline = banner.querySelector('.vibe-headline');
+      const card = document.getElementById('vibe-card');
+      const headline = card.querySelector('.headline');
       const text = headline ? `Pleasant Park Pickleball -- ${headline.textContent}` : 'Pleasant Park Pickleball -- check the courts!';
       const url = window.location.href;
       const shareText = `${text}\n${url}`;
@@ -327,26 +470,17 @@
         try { await navigator.share({ title: 'Pleasant Park Pickleball', text, url }); return; } catch {}
       }
 
-      // Clipboard fallback with visible feedback
       try {
         await navigator.clipboard.writeText(shareText);
       } catch {
-        // Final fallback for older browsers
         const ta = document.createElement('textarea');
-        ta.value = shareText;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
+        ta.value = shareText; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
       }
 
-      // Show "Copied!" toast
-      const btn = document.getElementById('share-btn');
       const toast = document.createElement('div');
       toast.textContent = 'Link copied!';
-      toast.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;z-index:999;animation:fadeSlideUp 0.3s ease-out';
+      toast.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:0.5rem 1.25rem;border-radius:100px;font-size:0.85rem;font-weight:500;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:fadeIn 0.3s ease-out';
       document.body.appendChild(toast);
       setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 1500);
       setTimeout(() => toast.remove(), 1800);
@@ -381,25 +515,73 @@
     function getTrend(readings) {
       if (readings.length < 3) return '';
       const r = readings.slice(-3).map(x => x.occupied_count);
-      if (r[r.length-1] > r[0]) return `${ICONS.trendUp} trending up`;
-      if (r[r.length-1] < r[0]) return `${ICONS.trendDown} winding down`;
-      return `${ICONS.minus} holding steady`;
+      if (r[r.length-1] > r[0]) return `${ICONS.trendUp} Trending up`;
+      if (r[r.length-1] < r[0]) return `${ICONS.trendDown} Winding down`;
+      return `${ICONS.minus} Holding steady`;
     }
 
     function isOffHours() { const h = new Date().getHours(); return h < 5 || h >= 22; }
 
-    // Vibe check & court strip
+    // Find the next typically busy hour today (for low-activity hints)
+    function getNextBusyHint() {
+      if (!bestTimesData) return '';
+      const now = new Date();
+      const today = now.getDay();
+      const currentHour = now.getHours();
+      const hd = bestTimesData[today];
+      for (const hour of Object.keys(hd).map(Number).sort((a,b) => a-b)) {
+        if (hour <= currentHour) continue;
+        const v = hd[hour]; if (!v.length) continue;
+        const avg = v.reduce((a,b) => a+b, 0) / v.length;
+        if (avg >= 4) {
+          const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
+          return `Usually picks up around ${lbl}`;
+        }
+      }
+      return '';
+    }
+
+    // Find the busiest day of the week overall
+    function getBusiestDay() {
+      if (!bestTimesData) return null;
+      let bestDay = -1, bestScore = 0;
+      for (let d = 0; d < 7; d++) {
+        const hd = bestTimesData[d];
+        let dayTotal = 0, dayCount = 0;
+        for (const hour of Object.keys(hd).map(Number)) {
+          const v = hd[hour]; if (!v.length) continue;
+          const avg = v.reduce((a,b) => a+b, 0) / v.length;
+          dayTotal += avg; dayCount++;
+        }
+        if (dayCount > 0 && dayTotal / dayCount > bestScore) {
+          bestScore = dayTotal / dayCount; bestDay = d;
+        }
+      }
+      if (bestDay < 0 || bestScore < 2) return null;
+      return { day: bestDay, name: DOW_NAMES[bestDay], avg: bestScore };
+    }
+
+    // Vibe card rendering
     function updateCurrentStatus(readings) {
-      const banner = document.getElementById('vibe-banner');
+      const card = document.getElementById('vibe-card');
+
       if (isOffHours()) {
-        banner.innerHTML = '<div class="vibe-headline">Courts are sleeping.</div><div class="vibe-sub">We\'ll be back at dawn.</div>';
-        banner.className = 'vibe-banner vibe-closed';
+        card.className = 'vibe-card state-closed animate-in';
+        card.innerHTML = `
+          <div class="verdict">After hours</div>
+          <div class="headline">Courts are sleeping</div>
+          <div class="subline">We'll be back at dawn</div>
+        `;
         return;
       }
 
       if (!readings || readings.length === 0) {
-        banner.innerHTML = '<div class="vibe-headline">No data yet</div><div class="vibe-sub">Check back after the first poll runs</div>';
-        banner.className = 'vibe-banner vibe-closed';
+        card.className = 'vibe-card state-closed animate-in';
+        card.innerHTML = `
+          <div class="verdict">Waiting</div>
+          <div class="headline">No data yet</div>
+          <div class="subline">Check back after the first poll runs</div>
+        `;
         return;
       }
 
@@ -409,41 +591,57 @@
       lastUpdateTime = ts;
       const trend = getTrend(readings);
 
-      // Check sustained activity from recent readings
-      const recentHigh = readings.slice(-3); // ~30 min of data
+      // Sustained activity check
+      const recentHigh = readings.slice(-3);
       const sustainedAt4Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 4);
       const sustainedAt5Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 5);
 
-      let vibeClass, headline, sub;
+      // Get next busy time hint from best times data
+      const nextBusyHint = getNextBusyHint();
+
+      let state, verdict, headline, sub;
       if (occupied >= 5 && sustainedAt5Plus) {
-        vibeClass = 'vibe-hot'; headline = 'Courts are packed.'; sub = 'People are rotating in -- get down here';
+        state = 'hot'; verdict = 'Get down here'; headline = 'Courts are packed!'; sub = 'Full rotation going -- this is the scene';
       } else if (occupied >= 4 && sustainedAt4Plus) {
-        vibeClass = 'vibe-hot'; headline = 'Open play is rolling.'; sub = 'Steady action for a while now';
+        state = 'hot'; verdict = 'Come play'; headline = 'Open play is rolling'; sub = 'Been going strong -- jump in';
       } else if (occupied >= 5) {
-        vibeClass = 'vibe-hot'; headline = "It's ON."; sub = `${occupied} of 6 courts going right now`;
+        state = 'hot'; verdict = 'Come play'; headline = "It's ON"; sub = `${occupied} of 6 courts going right now`;
       } else if (occupied === 4) {
-        vibeClass = 'vibe-hot'; headline = 'Open play is live.'; sub = 'Just getting going -- good time to roll up';
+        state = 'hot'; verdict = 'Good time to go'; headline = 'Open play is live'; sub = 'Building momentum -- good time to roll up';
       } else if (occupied === 3) {
-        vibeClass = 'vibe-warm'; headline = 'A few games going.'; sub = 'Likely hit or miss';
+        state = 'warm'; verdict = 'Coin flip'; headline = 'A few games going'; sub = '3 courts active -- you might find a game or wait a bit';
       } else if (occupied === 2) {
-        vibeClass = 'vibe-warm'; headline = 'Warming up.'; sub = 'A couple games going';
+        state = 'warm'; verdict = 'Warming up'; headline = 'A couple games going'; sub = nextBusyHint || 'Not quite open-play levels yet';
       } else if (occupied === 1) {
-        vibeClass = 'vibe-chill'; headline = 'Just getting started.'; sub = '1 court going -- bring a friend';
+        state = 'chill'; verdict = 'Bring a friend'; headline = 'Just getting started'; sub = nextBusyHint || '1 court in use -- not enough for open play yet';
       } else {
-        vibeClass = 'vibe-chill'; headline = 'Quiet out there.'; sub = 'Courts are wide open if you want \'em';
+        state = 'empty'; verdict = 'Wide open'; headline = 'Nobody out there'; sub = nextBusyHint || 'Courts are all yours if you want \'em';
       }
 
-      const trendHtml = trend ? `<div class="vibe-sub trend-indicator">${trend}</div>` : '';
+      // Build court pips
+      const courts = latest.courts || {};
+      let pipsHtml = '<div class="court-map">';
+      for (let i = 1; i <= 6; i++) {
+        const isActive = courts[`court_${i}`] === 'occupied';
+        pipsHtml += `<div class="court-pip ${isActive ? 'active' : 'open'}"></div>`;
+      }
+      pipsHtml += '</div>';
 
-      banner.innerHTML = `
-        <span class="vibe-count">${occupied}/6</span>
-        <span class="vibe-label">courts in play</span>
-        <div class="vibe-headline">${headline}</div>
-        <div class="vibe-sub">${sub}</div>
+      const trendHtml = trend ? `<div class="trend">${trend}</div>` : '';
+
+      card.className = `vibe-card state-${state} animate-in`;
+      card.innerHTML = `
+        <div class="verdict">${verdict}</div>
+        <div class="big-number">${occupied}<small>/6</small></div>
+        <div class="headline">${headline}</div>
+        <div class="subline">${sub}</div>
         ${trendHtml}
-        <div class="vibe-meta"><span class="live-dot"></span>LIVE -- updated <span id="last-update-time">${relativeTime(ts)}</span></div>
+        ${pipsHtml}
+        <div class="meta">
+          <span class="live-dot"></span>
+          <span>Updated <span id="last-update-time">${relativeTime(ts)}</span></span>
+        </div>
       `;
-      banner.className = `vibe-banner ${vibeClass}`;
     }
 
     // Chart
@@ -452,31 +650,56 @@
       const labels = readings.map(r => new Date(r.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
       const occupied = readings.map(r => r.occupied_count);
       const s = getComputedStyle(document.documentElement);
+      const accentColor = s.getPropertyValue('--accent').trim();
+      const hotColor = s.getPropertyValue('--hot').trim();
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
       if (chart) chart.destroy();
       chart = new Chart(ctx, {
         type: 'line',
         data: { labels, datasets: [{
-          label: 'Courts In Use', data: occupied,
-          borderColor: s.getPropertyValue('--accent').trim(),
-          backgroundColor: 'rgba(45,106,79,0.08)', fill: true, tension: 0.3,
-          pointRadius: 3, pointBackgroundColor: s.getPropertyValue('--accent').trim(),
+          label: 'Courts in use', data: occupied,
+          borderColor: accentColor,
+          backgroundColor: s.getPropertyValue('--accent-glow').trim(),
+          fill: true, tension: 0.35,
+          pointRadius: 2, pointHoverRadius: 5,
+          pointBackgroundColor: accentColor,
+          borderWidth: 2.5,
         }] },
         options: {
           responsive: true, maintainAspectRatio: false,
+          interaction: { intersect: false, mode: 'index' },
           plugins: {
-            legend: { labels: { color: s.getPropertyValue('--chart-legend').trim() } },
+            legend: { display: false },
             annotation: { annotations: { threshold: {
               type: 'line', yMin: 4, yMax: 4,
-              borderColor: 'rgba(232, 93, 38, 0.5)', borderWidth: 2, borderDash: [6, 4],
-              label: { display: true, content: 'Open play (4+)', position: 'start',
-                backgroundColor: 'rgba(232, 93, 38, 0.1)', color: s.getPropertyValue('--active') ? s.getPropertyValue('--active').trim() : '#e85d26',
-                font: { size: 11, family: 'Inter' }, padding: 3 },
+              borderColor: hotColor + '66', borderWidth: 1.5, borderDash: [6, 4],
+              label: { display: true, content: 'Open play zone', position: 'start',
+                backgroundColor: 'transparent', color: hotColor,
+                font: { size: 10, family: 'Inter', weight: '500' }, padding: { top: 2, bottom: 2 } },
             } } },
+            tooltip: {
+              backgroundColor: isDark ? '#1c2e1c' : '#ffffff',
+              titleColor: isDark ? '#d4e8d4' : '#1a2e1a',
+              bodyColor: isDark ? '#a3c4a3' : '#3d5a3d',
+              borderColor: isDark ? '#2a3d2a' : '#e2e8de',
+              borderWidth: 1, cornerRadius: 8, padding: 10,
+              titleFont: { weight: '600' },
+              callbacks: { label: ctx => `${ctx.parsed.y} of 6 courts` }
+            }
           },
           scales: {
-            x: { ticks: { color: s.getPropertyValue('--chart-tick').trim(), maxRotation: 45 }, grid: { color: s.getPropertyValue('--chart-grid').trim() } },
-            y: { min: 0, max: 6, ticks: { color: s.getPropertyValue('--chart-tick').trim(), stepSize: 1 }, grid: { color: s.getPropertyValue('--chart-grid').trim() } },
+            x: {
+              ticks: { color: s.getPropertyValue('--chart-tick').trim(), font: { size: 11 }, maxRotation: 0, autoSkipPadding: 20 },
+              grid: { color: s.getPropertyValue('--chart-grid').trim() },
+              border: { display: false }
+            },
+            y: {
+              min: 0, max: 6,
+              ticks: { color: s.getPropertyValue('--chart-tick').trim(), stepSize: 1, font: { size: 11 } },
+              grid: { color: s.getPropertyValue('--chart-grid').trim() },
+              border: { display: false }
+            },
           },
         },
       });
@@ -502,22 +725,63 @@
           if (bestTimesData[dow][hour] !== undefined) bestTimesData[dow][hour].push(r.occupied_count);
         }
       }
+
+      renderPeakBanner();
       renderHotTimesSummary();
+
       const picker = document.getElementById('dow-picker');
       const today = new Date().getDay();
-      picker.innerHTML = DOW_SHORT.map((n,i) => `<button class="dow-btn ${i===today?'active':''}" data-dow="${i}">${n}</button>`).join('');
-      picker.querySelectorAll('.dow-btn').forEach(b => b.addEventListener('click', () => {
-        picker.querySelectorAll('.dow-btn').forEach(x => x.classList.remove('active'));
+      picker.innerHTML = DOW_SHORT.map((n,i) => `<button class="pill-btn ${i===today?'active':''}" data-dow="${i}">${n}</button>`).join('');
+      picker.querySelectorAll('.pill-btn').forEach(b => b.addEventListener('click', () => {
+        picker.querySelectorAll('.pill-btn').forEach(x => x.classList.remove('active'));
         b.classList.add('active'); renderBestTimes(parseInt(b.dataset.dow));
       }));
       renderBestTimes(today);
+
       const toggleBtn = document.getElementById('detail-toggle'), detailDiv = document.getElementById('daily-detail');
       toggleBtn.style.display = 'inline-block';
       toggleBtn.addEventListener('click', () => {
         const showing = detailDiv.style.display !== 'none';
         detailDiv.style.display = showing ? 'none' : 'block';
-        toggleBtn.textContent = showing ? 'Show daily breakdown' : 'Hide daily breakdown';
+        toggleBtn.textContent = showing ? 'Daily breakdown' : 'Hide breakdown';
       });
+    }
+
+    function renderPeakBanner() {
+      const el = document.getElementById('peak-banner');
+      if (!bestTimesData) { el.style.display = 'none'; return; }
+
+      // Find peak time for today's day-of-week
+      const today = new Date().getDay();
+      const hd = bestTimesData[today];
+      let peakHour = -1, peakAvg = 0;
+      for (const hour of Object.keys(hd).map(Number)) {
+        const v = hd[hour]; if (!v.length) continue;
+        const avg = v.reduce((a,b) => a+b, 0) / v.length;
+        if (avg > peakAvg) { peakAvg = avg; peakHour = hour; }
+      }
+
+      if (peakHour < 0 || peakAvg < 3) { el.style.display = 'none'; return; }
+
+      const lbl = new Date(2026,0,1,peakHour).toLocaleTimeString('en-US',{hour:'numeric'});
+      const now = new Date().getHours();
+
+      let msg;
+      if (now < peakHour) {
+        msg = `<strong>${lbl}</strong> is usually the busiest time today (${peakAvg.toFixed(1)} avg courts). Get there early!`;
+      } else if (now === peakHour) {
+        msg = `<strong>Right now</strong> is typically peak time on ${DOW_SHORT[today]}s (${peakAvg.toFixed(1)} avg courts). Go go go!`;
+      } else {
+        msg = `Peak time today was around <strong>${lbl}</strong> (${peakAvg.toFixed(1)} avg courts). Tomorrow's another day!`;
+      }
+
+      // Find busiest day for social player context
+      const busiest = getBusiestDay();
+      const busiestHtml = busiest ? `<div style="font-size:0.75rem;margin-top:0.35rem;opacity:0.8">${busiest.name}s tend to be the busiest day of the week</div>` : '';
+
+      el.style.display = 'flex';
+      el.className = 'peak-banner';
+      el.innerHTML = `<div class="peak-icon">${peakAvg >= 4 ? '🔥' : '📊'}</div><div class="peak-text">${msg}${busiestHtml}</div>`;
     }
 
     function renderHotTimesSummary() {
@@ -527,20 +791,19 @@
       let hasAny = false, html = '<div class="hot-times-grid">';
       for (let d = 0; d < 7; d++) {
         const isToday = d === today;
-        html += `<div class="hot-day-col${isToday?' hot-day-col-today':''}"><div class="day-header">${isToday?DOW_SHORT[d]+' (today)':DOW_SHORT[d]}</div>`;
+        html += `<div class="hot-day-col${isToday?' hot-day-col-today':''}"><div class="day-header">${DOW_SHORT[d]}${isToday?' *':''}</div>`;
         const hd = bestTimesData[d]; let dayHot = false, dayData = false;
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
           const avg = v.reduce((a,b)=>a+b,0)/v.length;
           if (avg >= 4) {
             const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-            // Heat map opacity based on avg (4=60%, 5=80%, 6=100%)
             const intensity = Math.min((avg - 3) / 3, 1);
-            html += `<div class="hot-time" style="background:rgba(45,106,79,${0.06 + intensity * 0.12}); color:var(--green); border-left:3px solid var(--green)">${lbl}<br><span style="font-size:0.7rem;opacity:0.7">${avg.toFixed(1)} avg</span></div>`;
+            html += `<div class="hot-time" style="background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
             dayHot = true; hasAny = true;
           }
         }
-        if (!dayHot) html += `<div class="no-hot">${dayData?'--':'Not yet tracked'}</div>`;
+        if (!dayHot) html += `<div class="no-hot">${dayData?'--':'--'}</div>`;
         html += '</div>';
       }
       html += '</div>';
@@ -557,7 +820,7 @@
       c.innerHTML = entries.map(({hour,avg,samples})=>{
         const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
         const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
-        return `<div class="time-slot ${cls}"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg in use<br><span style="font-size:0.75rem;opacity:0.7">${samples} sample${samples!==1?'s':''}</span></div>`;
+        return `<div class="time-slot ${cls}"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></div>`;
       }).join('');
     }
 
@@ -568,10 +831,10 @@
       picker.innerHTML = dates.map((d,i) => {
         const dt = new Date(d+'T12:00:00');
         const lbl = i===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-        return `<button class="day-btn ${i===0?'active':''}" data-date="${d}">${lbl}</button>`;
+        return `<button class="pill-btn ${i===0?'active':''}" data-date="${d}">${lbl}</button>`;
       }).join('');
-      picker.querySelectorAll('.day-btn').forEach(b => b.addEventListener('click', () => {
-        picker.querySelectorAll('.day-btn').forEach(x=>x.classList.remove('active'));
+      picker.querySelectorAll('.pill-btn').forEach(b => b.addEventListener('click', () => {
+        picker.querySelectorAll('.pill-btn').forEach(x=>x.classList.remove('active'));
         b.classList.add('active'); onSelect(b.dataset.date);
       }));
     }
@@ -602,7 +865,7 @@
     }
 
     init();
-    setInterval(autoRefresh, 300000); // 5 minutes
+    setInterval(autoRefresh, 300000);
   </script>
 </body>
 </html>
