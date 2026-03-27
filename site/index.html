@@ -842,6 +842,18 @@
       const c = document.getElementById('hot-times-summary');
       if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
       const today = new Date().getDay();
+
+      // Find the week's single hottest slot to highlight it
+      let weekPeakAvg = 0;
+      for (let d = 0; d < 7; d++) {
+        const hd = bestTimesData[d];
+        for (const hour of Object.keys(hd).map(Number)) {
+          const v = hd[hour]; if (!v.length) continue;
+          const avg = v.reduce((a,b) => a+b, 0) / v.length;
+          if (avg > weekPeakAvg) weekPeakAvg = avg;
+        }
+      }
+
       let hasAny = false, html = '<div class="hot-times-grid">';
       for (let d = 0; d < 7; d++) {
         const isToday = d === today;
@@ -853,11 +865,15 @@
           if (avg >= 4) {
             const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
             const intensity = Math.min((avg - 3) / 3, 1);
-            html += `<div class="hot-time" style="background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
+            const isWeekPeak = weekPeakAvg > 0 && Math.abs(avg - weekPeakAvg) < 0.01;
+            const peakStyle = isWeekPeak
+              ? `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`
+              : `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
+            html += `<div class="hot-time" style="${peakStyle}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
             dayHot = true; hasAny = true;
           }
         }
-        if (!dayHot) html += `<div class="no-hot">${dayData?'--':'--'}</div>`;
+        if (!dayHot) html += `<div class="no-hot">${dayData ? 'No peak' : 'No data'}</div>`;
         html += '</div>';
       }
       html += '</div>';
