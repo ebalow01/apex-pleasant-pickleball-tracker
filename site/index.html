@@ -138,6 +138,7 @@
       display: flex; align-items: center; justify-content: center; transition: all 0.2s;
     }
     .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     /* ========= VIBE CARD - The main attraction ========= */
     .vibe-card {
@@ -147,6 +148,7 @@
       box-shadow: var(--shadow-sm); transition: all 0.4s ease;
       position: relative; overflow: hidden;
     }
+    @media (min-width: 768px) { .vibe-card { padding: 2rem 1.5rem; } }
 
     .vibe-card::before {
       content: ''; position: absolute; inset: 0;
@@ -154,19 +156,20 @@
       opacity: 0; transition: opacity 0.4s;
     }
 
+    /* Type scale: 0.75 / 0.875 / 1 / 1.25 / 1.5 / 3 rem */
     .vibe-card .verdict {
-      font-family: 'Outfit', sans-serif; font-size: 0.7rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.12em;
+      font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
       padding: 0.3rem 0.75rem; border-radius: 100px; display: inline-block;
       margin-bottom: 0.75rem; position: relative;
     }
 
     .vibe-card .big-number {
-      font-family: 'Outfit', sans-serif; font-size: 4rem; font-weight: 900;
+      font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 900;
       line-height: 1; letter-spacing: -0.04em; position: relative;
     }
     .vibe-card .big-number small {
-      font-size: 1.5rem; font-weight: 600; opacity: 0.5;
+      font-size: 1.25rem; font-weight: 600; opacity: 0.5;
     }
 
     .vibe-card .headline {
@@ -174,15 +177,15 @@
       margin-top: 0.25rem; position: relative;
     }
     .vibe-card .subline {
-      font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.15rem;
+      font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.15rem;
       position: relative;
     }
     .vibe-card .meta {
-      font-size: 0.7rem; color: var(--text-muted); margin-top: 0.75rem;
+      font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;
       display: flex; align-items: center; justify-content: center; gap: 0.5rem;
       position: relative;
     }
-    .vibe-card .trend { font-size: 0.8rem; position: relative; }
+    .vibe-card .trend { font-size: 0.875rem; position: relative; }
 
     /* Vibe states */
     .vibe-card.state-hot {
@@ -227,7 +230,7 @@
 
     /* ========= COURT MINI-MAP ========= */
     .court-map {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.35rem;
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.375rem;
       margin-top: 1rem; position: relative;
     }
     .court-pip {
@@ -245,13 +248,14 @@
       border-radius: var(--radius); padding: 1rem 1.25rem;
       margin-bottom: 0.75rem; box-shadow: var(--shadow-sm);
     }
+    @media (min-width: 768px) { .card { padding: 1.25rem 1.5rem; } }
     .card-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
     }
     .card-title {
-      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700;
-      display: flex; align-items: center; gap: 0.4rem;
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; gap: 0.5rem;
     }
     .card-title .card-icon {
       width: 28px; height: 28px; border-radius: 8px;
@@ -275,8 +279,12 @@
       display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 0.35rem; width: 100%;
     }
-    @media (max-width: 600px) { .hot-times-grid { grid-template-columns: repeat(4, 1fr); } }
-    @media (max-width: 400px) { .hot-times-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 600px) {
+      .hot-times-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem 0.35rem;
+      }
+    }
 
     .hot-day-col { display: flex; flex-direction: column; gap: 0.25rem; }
     .hot-day-col .day-header {
@@ -301,6 +309,7 @@
       font-size: 0.75rem; font-family: inherit; transition: all 0.2s;
     }
     .detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .detail-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
     .best-times-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -337,6 +346,7 @@
     }
     @media (max-width: 600px) { .pill-btn { min-height: 40px; padding: 0.4rem 0.85rem; } }
     .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .pill-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     .pill-btn.active {
       background: var(--accent); border-color: var(--accent); color: #fff;
       box-shadow: 0 2px 8px var(--accent-glow);
