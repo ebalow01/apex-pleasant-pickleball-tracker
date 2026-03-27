@@ -309,7 +309,7 @@
     .time-slot {
       padding: 0.5rem 0.4rem; border-radius: 8px; text-align: center; font-size: 0.8rem;
     }
-    .time-hot { background: var(--green-soft); color: var(--green); border-left: 3px solid var(--green); }
+    .time-hot { background: var(--green-soft); color: var(--green); border-left: 3px solid var(--green); font-weight: 600; }
     .time-warm { background: rgba(45,106,79,0.04); color: var(--accent); border-left: 3px solid var(--accent); }
     .time-cold { background: var(--surface-raised); color: var(--text-muted); border-left: 3px solid var(--border); }
 
@@ -319,6 +319,15 @@
       scrollbar-width: none; -webkit-overflow-scrolling: touch;
     }
     .pill-picker::-webkit-scrollbar { display: none; }
+    .pill-picker-wrap {
+      position: relative;
+    }
+    .pill-picker-wrap::after {
+      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 24px;
+      background: linear-gradient(to right, transparent, var(--surface));
+      pointer-events: none; opacity: 0; transition: opacity 0.2s;
+    }
+    .pill-picker-wrap.has-overflow::after { opacity: 1; }
     .pill-btn {
       background: var(--surface-raised); border: 1px solid var(--border-subtle);
       color: var(--text-secondary); padding: 0.35rem 0.8rem; min-height: 36px;
@@ -397,7 +406,7 @@
     </header>
 
     <!-- Vibe Card - THE main thing -->
-    <div id="vibe-card" class="vibe-card state-closed animate-in">
+    <div id="vibe-card" class="vibe-card state-closed animate-in" role="status" aria-live="polite">
       <div class="loading">Loading...</div>
     </div>
 
@@ -417,7 +426,7 @@
         <div class="loading">Collecting data...</div>
       </div>
       <div id="daily-detail" class="daily-detail" style="display: none;">
-        <div id="dow-picker" class="dow-picker pill-picker"></div>
+        <div id="dow-picker" class="dow-picker pill-picker" role="tablist" aria-label="Select day of week"></div>
         <div id="best-times" class="best-times-grid" style="margin-top: 0.5rem;"></div>
       </div>
     </div>
@@ -431,7 +440,7 @@
           </div>
           Today's Action
         </div>
-        <div id="day-picker" class="pill-picker"></div>
+        <div class="pill-picker-wrap"><div id="day-picker" class="pill-picker" role="tablist" aria-label="Select day"></div></div>
       </div>
       <div class="chart-label"><span class="chart-label-dot"></span> Courts in use throughout the day</div>
       <div class="chart-container">
@@ -872,6 +881,13 @@
         picker.querySelectorAll('.pill-btn').forEach(x=>x.classList.remove('active'));
         b.classList.add('active'); onSelect(b.dataset.date);
       }));
+      // Scroll overflow hint
+      const wrap = picker.parentElement;
+      if (wrap && wrap.classList.contains('pill-picker-wrap')) {
+        const check = () => wrap.classList.toggle('has-overflow', picker.scrollWidth > picker.clientWidth + 8 && picker.scrollLeft < picker.scrollWidth - picker.clientWidth - 8);
+        check(); picker.addEventListener('scroll', check, { passive: true });
+        new ResizeObserver(check).observe(picker);
+      }
     }
 
     let currentChartDate = null;
