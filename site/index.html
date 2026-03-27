@@ -196,6 +196,18 @@
     @keyframes pulse-glow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 30px var(--hot-glow); } }
     .vibe-card.state-hot .big-number { animation: pulse-glow 2s ease-in-out infinite; }
 
+    @keyframes hot-shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .vibe-card.state-hot::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit;
+      background: linear-gradient(90deg, transparent 0%, var(--hot-glow) 50%, transparent 100%);
+      background-size: 200% 100%; opacity: 0.3;
+      animation: hot-shimmer 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
     .vibe-card.state-warm .verdict { background: var(--warm-soft); color: var(--warm); }
     .vibe-card.state-warm .big-number { color: var(--warm); }
     .vibe-card.state-warm { border-color: var(--warm); }
@@ -223,6 +235,9 @@
     }
     .court-pip.active { background: var(--hot); }
     .court-pip.open { background: var(--border); }
+    .state-hot .court-pip.active {
+      box-shadow: 0 0 6px var(--hot-glow);
+    }
 
     /* ========= CARDS ========= */
     .card {
@@ -306,11 +321,12 @@
     .pill-picker::-webkit-scrollbar { display: none; }
     .pill-btn {
       background: var(--surface-raised); border: 1px solid var(--border-subtle);
-      color: var(--text-secondary); padding: 0.3rem 0.7rem; min-height: 32px;
-      border-radius: 100px; cursor: pointer; font-size: 0.72rem; font-weight: 500;
+      color: var(--text-secondary); padding: 0.35rem 0.8rem; min-height: 36px;
+      border-radius: 100px; cursor: pointer; font-size: 0.75rem; font-weight: 500;
       font-family: inherit; white-space: nowrap; display: inline-flex;
       align-items: center; transition: all 0.2s;
     }
+    @media (max-width: 600px) { .pill-btn { min-height: 40px; padding: 0.4rem 0.85rem; } }
     .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
     .pill-btn.active {
       background: var(--accent); border-color: var(--accent); color: #fff;
@@ -566,11 +582,30 @@
       const card = document.getElementById('vibe-card');
 
       if (isOffHours()) {
+        // Show tomorrow's peak if available
+        let tomorrowHint = '';
+        if (bestTimesData) {
+          const tomorrow = (new Date().getDay() + 1) % 7;
+          const hd = bestTimesData[tomorrow];
+          if (hd) {
+            let peakH = -1, peakA = 0;
+            for (const h of Object.keys(hd).map(Number)) {
+              const v = hd[h]; if (!v.length) continue;
+              const avg = v.reduce((a,b) => a+b,0) / v.length;
+              if (avg > peakA) { peakA = avg; peakH = h; }
+            }
+            if (peakH >= 0 && peakA >= 3) {
+              const lbl = new Date(2026,0,1,peakH).toLocaleTimeString('en-US',{hour:'numeric'});
+              tomorrowHint = `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem">Tomorrow's peak is usually around ${lbl}</div>`;
+            }
+          }
+        }
         card.className = 'vibe-card state-closed animate-in';
         card.innerHTML = `
           <div class="verdict">After hours</div>
           <div class="headline">Courts are sleeping</div>
-          <div class="subline">We'll be back at dawn</div>
+          <div class="subline">Tracking resumes at 5 AM</div>
+          ${tomorrowHint}
         `;
         return;
       }
