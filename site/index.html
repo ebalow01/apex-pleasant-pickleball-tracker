@@ -899,17 +899,18 @@
           const avg = v.reduce((a,b)=>a+b,0)/v.length;
           if (avg >= 3) slots.push({ hour, avg });
         }
-        // Merge consecutive hours into ranges
+        // Merge consecutive hours into ranges, but only within the same tier
         const ranges = [];
         for (const slot of slots) {
+          const tier = slot.avg >= 4 ? 'hot' : 'warm';
           const prev = ranges[ranges.length - 1];
-          if (prev && slot.hour === prev.endHour + 1) {
+          if (prev && slot.hour === prev.endHour + 1 && prev.tier === tier) {
             prev.endHour = slot.hour;
             prev.avgSum += slot.avg;
             prev.count++;
             prev.maxAvg = Math.max(prev.maxAvg, slot.avg);
           } else {
-            ranges.push({ startHour: slot.hour, endHour: slot.hour, avgSum: slot.avg, count: 1, maxAvg: slot.avg });
+            ranges.push({ startHour: slot.hour, endHour: slot.hour, avgSum: slot.avg, count: 1, maxAvg: slot.avg, tier });
           }
         }
         for (const r of ranges) {
