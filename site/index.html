@@ -322,17 +322,29 @@
     .time-warm { background: rgba(45,106,79,0.04); color: var(--accent); border-left: 3px solid var(--accent); }
     .time-cold { background: var(--surface-raised); color: var(--text-muted); border-left: 3px solid var(--border); }
 
+    .time-slot.expanded {
+      grid-column: 1 / -1; text-align: left;
+      padding: 0.75rem;
+    }
+    .time-slot.expanded > strong,
+    .time-slot.expanded > br,
+    .time-slot.expanded > span { display: none; }
+    .time-slot.expanded::before {
+      content: attr(data-label);
+      display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;
+    }
     .drill-down {
-      margin-top: 0.5rem; padding-top: 0.5rem;
-      border-top: 1px solid var(--border-subtle);
-      text-align: left;
+      display: flex; flex-direction: column; gap: 0.25rem;
     }
     .drill-row {
-      display: flex; align-items: center; gap: 0.4rem;
-      padding: 0.2rem 0; font-size: 0.75rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.3rem 0.25rem; font-size: 0.75rem;
+      border-radius: 4px;
     }
-    .drill-date { width: 3rem; color: var(--text-muted); font-size: 0.7rem; flex-shrink: 0; }
-    .drill-count { color: var(--text-secondary); font-weight: 600; font-size: 0.7rem; margin-left: auto; }
+    .drill-row:nth-child(odd) { background: var(--bg); }
+    .drill-date { width: 3.5rem; color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
+    .drill-pips { display: flex; gap: 3px; align-items: center; }
+    .drill-count { color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; margin-left: auto; }
 
     /* ========= DAY/DOW PICKERS ========= */
     .pill-picker {
@@ -973,23 +985,37 @@
           const hour = parseInt(el.dataset.hour);
           const entry = entries.find(e => e.hour === hour);
           if (!entry) return;
+          const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
           // Toggle: if already expanded, collapse
-          const existing = el.querySelector('.drill-down');
-          if (existing) { existing.remove(); el.style.borderRadius = ''; return; }
+          if (el.classList.contains('expanded')) {
+            el.classList.remove('expanded');
+            el.querySelector('.drill-down')?.remove();
+            return;
+          }
           // Collapse any other open drill-downs
-          c.querySelectorAll('.drill-down').forEach(dd => dd.remove());
-          // Build drill-down list sorted by date descending
-          const sorted = [...entry.readings].sort((a, b) => b.date.localeCompare(a.date));
+          c.querySelectorAll('.time-slot.expanded').forEach(other => {
+            other.classList.remove('expanded');
+            other.querySelector('.drill-down')?.remove();
+          });
+          // Aggregate readings by date (max count per date for this hour)
+          const byDate = {};
+          for (const r of entry.readings) {
+            if (!byDate[r.date] || r.count > byDate[r.date]) byDate[r.date] = r.count;
+          }
+          const sorted = Object.entries(byDate).sort((a, b) => b[0].localeCompare(a[0]));
           const dd = document.createElement('div');
           dd.className = 'drill-down';
-          dd.innerHTML = sorted.map(r => {
-            const dt = new Date(r.date + 'T12:00:00');
+          dd.innerHTML = `<div style="font-size:0.85rem;font-weight:600;margin-bottom:0.35rem">${lbl} — ${entry.avg.toFixed(1)} avg, ${sorted.length} ${DOW_NAMES[new Date().getDay()]}${sorted.length!==1?'s':''}</div>` +
+            sorted.map(([date, count]) => {
+            const dt = new Date(date + 'T12:00:00');
             const dateLbl = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             const pips = Array.from({length: 6}, (_, i) =>
-              `<span style="display:inline-block;width:8px;height:4px;border-radius:2px;margin-right:2px;background:${i < r.count ? 'var(--accent)' : 'var(--border)'}"></span>`
+              `<span style="display:inline-block;width:10px;height:5px;border-radius:2px;background:${i < count ? 'var(--accent)' : 'var(--border)'}"></span>`
             ).join('');
-            return `<div class="drill-row"><span class="drill-date">${dateLbl}</span>${pips}<span class="drill-count">${r.count}/6</span></div>`;
+            return `<div class="drill-row"><span class="drill-date">${dateLbl}</span><span class="drill-pips">${pips}</span><span class="drill-count">${count}/6</span></div>`;
           }).join('');
+          el.dataset.label = `${lbl} — ${entry.avg.toFixed(1)} avg`;
+          el.classList.add('expanded');
           el.appendChild(dd);
         });
       });
