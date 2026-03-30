@@ -322,6 +322,18 @@
     .time-warm { background: rgba(45,106,79,0.04); color: var(--accent); border-left: 3px solid var(--accent); }
     .time-cold { background: var(--surface-raised); color: var(--text-muted); border-left: 3px solid var(--border); }
 
+    .drill-down {
+      margin-top: 0.5rem; padding-top: 0.5rem;
+      border-top: 1px solid var(--border-subtle);
+      text-align: left;
+    }
+    .drill-row {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.2rem 0; font-size: 0.75rem;
+    }
+    .drill-date { width: 3rem; color: var(--text-muted); font-size: 0.7rem; flex-shrink: 0; }
+    .drill-count { color: var(--text-secondary); font-weight: 600; font-size: 0.7rem; margin-left: auto; }
+
     /* ========= DAY/DOW PICKERS ========= */
     .pill-picker {
       display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto;
@@ -567,7 +579,7 @@
       for (const hour of Object.keys(hd).map(Number).sort((a,b) => a-b)) {
         if (hour <= currentHour) continue;
         const v = hd[hour]; if (!v.length) continue;
-        const avg = v.reduce((a,b) => a+b, 0) / v.length;
+        const avg = btAvg(v);
         if (avg >= 4) {
           const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
           return `Usually picks up around ${lbl}`;
@@ -585,7 +597,7 @@
         let dayTotal = 0, dayCount = 0;
         for (const hour of Object.keys(hd).map(Number)) {
           const v = hd[hour]; if (!v.length) continue;
-          const avg = v.reduce((a,b) => a+b, 0) / v.length;
+          const avg = btAvg(v);
           dayTotal += avg; dayCount++;
         }
         if (dayCount > 0 && dayTotal / dayCount > bestScore) {
@@ -765,6 +777,9 @@
     let bestTimesData = null;
     let todayReadings = null; // store today's actual readings for peak comparison
 
+    // Helper: get average count from bestTimesData entries (which are {count, date} objects)
+    function btAvg(entries) { return entries.reduce((s, e) => s + e.count, 0) / entries.length; }
+
     async function computeBestTimes(index, todayData) {
       todayReadings = todayData || null;
       bestTimesData = {};
@@ -778,7 +793,7 @@
         for (const r of dd) {
           if (r.occupied_count === 0) continue;
           const hour = new Date(r.timestamp).getHours();
-          if (bestTimesData[dow][hour] !== undefined) bestTimesData[dow][hour].push(r.occupied_count);
+          if (bestTimesData[dow][hour] !== undefined) bestTimesData[dow][hour].push({ count: r.occupied_count, date: ds });
         }
       }
 
@@ -828,7 +843,7 @@
       let histPeakHour = -1, histPeakAvg = 0;
       for (const hour of Object.keys(hd).map(Number)) {
         const v = hd[hour]; if (!v.length) continue;
-        const avg = v.reduce((a,b) => a+b, 0) / v.length;
+        const avg = btAvg(v);
         if (avg > histPeakAvg) { histPeakAvg = avg; histPeakHour = hour; }
       }
 
@@ -882,7 +897,7 @@
         const hd = bestTimesData[d];
         for (const hour of Object.keys(hd).map(Number)) {
           const v = hd[hour]; if (!v.length) continue;
-          const avg = v.reduce((a,b) => a+b, 0) / v.length;
+          const avg = btAvg(v);
           if (avg > weekPeakAvg) weekPeakAvg = avg;
         }
       }
@@ -896,7 +911,7 @@
         const slots = [];
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
-          const avg = v.reduce((a,b)=>a+b,0)/v.length;
+          const avg = btAvg(v);
           if (avg >= 3) slots.push({ hour, avg });
         }
         // Merge consecutive hours into ranges, but only within the same tier
@@ -945,13 +960,39 @@
       const c = document.getElementById('best-times');
       if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
       const hd = bestTimesData[dow];
-      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:v.reduce((a,b)=>a+b,0)/v.length,samples:v.length}));
+      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:btAvg(v),samples:v.length,readings:v}));
       if (!entries.length) { c.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet.</div>`; return; }
       c.innerHTML = entries.map(({hour,avg,samples})=>{
         const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
         const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
-        return `<div class="time-slot ${cls}"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></div>`;
+        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></div>`;
       }).join('');
+      // Click to drill down into individual readings
+      c.querySelectorAll('.time-slot[data-hour]').forEach(el => {
+        el.addEventListener('click', () => {
+          const hour = parseInt(el.dataset.hour);
+          const entry = entries.find(e => e.hour === hour);
+          if (!entry) return;
+          // Toggle: if already expanded, collapse
+          const existing = el.querySelector('.drill-down');
+          if (existing) { existing.remove(); el.style.borderRadius = ''; return; }
+          // Collapse any other open drill-downs
+          c.querySelectorAll('.drill-down').forEach(dd => dd.remove());
+          // Build drill-down list sorted by date descending
+          const sorted = [...entry.readings].sort((a, b) => b.date.localeCompare(a.date));
+          const dd = document.createElement('div');
+          dd.className = 'drill-down';
+          dd.innerHTML = sorted.map(r => {
+            const dt = new Date(r.date + 'T12:00:00');
+            const dateLbl = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const pips = Array.from({length: 6}, (_, i) =>
+              `<span style="display:inline-block;width:8px;height:4px;border-radius:2px;margin-right:2px;background:${i < r.count ? 'var(--accent)' : 'var(--border)'}"></span>`
+            ).join('');
+            return `<div class="drill-row"><span class="drill-date">${dateLbl}</span>${pips}<span class="drill-count">${r.count}/6</span></div>`;
+          }).join('');
+          el.appendChild(dd);
+        });
+      });
     }
 
     function buildDayPicker(index, onSelect) {
