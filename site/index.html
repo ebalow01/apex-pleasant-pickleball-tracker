@@ -326,9 +326,7 @@
       grid-column: 1 / -1; text-align: left;
       padding: 0.75rem;
     }
-    .time-slot.expanded > strong,
-    .time-slot.expanded > br,
-    .time-slot.expanded > span:not(.drill-pips) { display: none; }
+    .time-slot.expanded > .slot-summary { display: none; }
     .drill-down {
       display: flex; flex-direction: column; gap: 0.25rem;
     }
@@ -973,7 +971,7 @@
       c.innerHTML = entries.map(({hour,avg,samples})=>{
         const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
         const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
-        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></div>`;
+        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><span class="slot-summary"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></span></div>`;
       }).join('');
       // Click to drill down into individual readings
       c.querySelectorAll('.time-slot[data-hour]').forEach(el => {
