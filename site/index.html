@@ -892,28 +892,45 @@
         const isToday = d === today;
         html += `<div class="hot-day-col${isToday?' hot-day-col-today':''}"><div class="day-header">${DOW_SHORT[d]}${isToday?' *':''}</div>`;
         const hd = bestTimesData[d]; let dayHot = false, dayData = false;
+        // Collect qualifying hours with their averages
+        const slots = [];
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
           const avg = v.reduce((a,b)=>a+b,0)/v.length;
-          if (avg >= 3) {
-            const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-            const isHot = avg >= 4;
-            const isWeekPeak = weekPeakAvg > 0 && Math.abs(avg - weekPeakAvg) < 0.01;
-            let style;
-            if (isWeekPeak) {
-              const intensity = Math.min((avg - 3) / 3, 1);
-              style = `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`;
-            } else if (isHot) {
-              const intensity = Math.min((avg - 3) / 3, 1);
-              style = `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
-            } else {
-              // Warm tier: 3.0-3.9 avg — shows as lighter/muted
-              style = `background:rgba(45,106,79,0.04); color:var(--text-secondary); border: 1px dashed rgba(45,106,79,0.25)`;
-            }
-            const tierLabel = isHot ? avg.toFixed(1) + ' avg' : avg.toFixed(1) + ' avg';
-            html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${tierLabel}</span></div>`;
-            dayHot = true; hasAny = true;
+          if (avg >= 3) slots.push({ hour, avg });
+        }
+        // Merge consecutive hours into ranges
+        const ranges = [];
+        for (const slot of slots) {
+          const prev = ranges[ranges.length - 1];
+          if (prev && slot.hour === prev.endHour + 1) {
+            prev.endHour = slot.hour;
+            prev.avgSum += slot.avg;
+            prev.count++;
+            prev.maxAvg = Math.max(prev.maxAvg, slot.avg);
+          } else {
+            ranges.push({ startHour: slot.hour, endHour: slot.hour, avgSum: slot.avg, count: 1, maxAvg: slot.avg });
           }
+        }
+        for (const r of ranges) {
+          const avg = r.avgSum / r.count;
+          const startLbl = new Date(2026,0,1,r.startHour).toLocaleTimeString('en-US',{hour:'numeric'});
+          const endLbl = new Date(2026,0,1,r.endHour + 1).toLocaleTimeString('en-US',{hour:'numeric'});
+          const lbl = r.startHour === r.endHour ? startLbl : `${startLbl}-${endLbl}`;
+          const isHot = r.maxAvg >= 4;
+          const isWeekPeak = weekPeakAvg > 0 && r.maxAvg >= weekPeakAvg - 0.01;
+          let style;
+          if (isWeekPeak) {
+            const intensity = Math.min((r.maxAvg - 3) / 3, 1);
+            style = `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`;
+          } else if (isHot) {
+            const intensity = Math.min((r.maxAvg - 3) / 3, 1);
+            style = `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
+          } else {
+            style = `background:rgba(45,106,79,0.04); color:var(--text-secondary); border: 1px dashed rgba(45,106,79,0.25)`;
+          }
+          html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
+          dayHot = true; hasAny = true;
         }
         if (!dayHot) html += `<div class="no-hot">${dayData ? 'No peak' : 'No data'}</div>`;
         html += '</div>';
