@@ -328,11 +328,7 @@
     }
     .time-slot.expanded > strong,
     .time-slot.expanded > br,
-    .time-slot.expanded > span { display: none; }
-    .time-slot.expanded::before {
-      content: attr(data-label);
-      display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;
-    }
+    .time-slot.expanded > span:not(.drill-pips) { display: none; }
     .drill-down {
       display: flex; flex-direction: column; gap: 0.25rem;
     }
@@ -1014,7 +1010,6 @@
             ).join('');
             return `<div class="drill-row"><span class="drill-date">${dateLbl}</span><span class="drill-pips">${pips}</span><span class="drill-count">${count}/6</span></div>`;
           }).join('');
-          el.dataset.label = `${lbl} — ${entry.avg.toFixed(1)} avg`;
           el.classList.add('expanded');
           el.appendChild(dd);
         });
