@@ -763,8 +763,10 @@
     const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let bestTimesData = null;
+    let todayReadings = null; // store today's actual readings for peak comparison
 
-    async function computeBestTimes(index) {
+    async function computeBestTimes(index, todayData) {
+      todayReadings = todayData || null;
       bestTimesData = {};
       for (let d = 0; d < 7; d++) { bestTimesData[d] = {}; for (let h = 5; h < 22; h++) bestTimesData[d][h] = []; }
       const datesToLoad = index.dates.slice(0, 28);
@@ -805,29 +807,60 @@
       const el = document.getElementById('peak-banner');
       if (!bestTimesData) { el.style.display = 'none'; return; }
 
-      // Find peak time for today's day-of-week
+      const now = new Date().getHours();
+
+      // Find today's ACTUAL peak from live readings
+      let todayPeakHour = -1, todayPeakCount = 0;
+      if (todayReadings && todayReadings.length > 0) {
+        const hourMax = {};
+        for (const r of todayReadings) {
+          const h = new Date(r.timestamp).getHours();
+          if (!hourMax[h] || r.occupied_count > hourMax[h]) hourMax[h] = r.occupied_count;
+        }
+        for (const [h, count] of Object.entries(hourMax)) {
+          if (count > todayPeakCount) { todayPeakCount = count; todayPeakHour = parseInt(h); }
+        }
+      }
+
+      // Find historical peak time for today's day-of-week
       const today = new Date().getDay();
       const hd = bestTimesData[today];
-      let peakHour = -1, peakAvg = 0;
+      let histPeakHour = -1, histPeakAvg = 0;
       for (const hour of Object.keys(hd).map(Number)) {
         const v = hd[hour]; if (!v.length) continue;
         const avg = v.reduce((a,b) => a+b, 0) / v.length;
-        if (avg > peakAvg) { peakAvg = avg; peakHour = hour; }
+        if (avg > histPeakAvg) { histPeakAvg = avg; histPeakHour = hour; }
       }
 
-      if (peakHour < 0 || peakAvg < 3) { el.style.display = 'none'; return; }
-
-      const lbl = new Date(2026,0,1,peakHour).toLocaleTimeString('en-US',{hour:'numeric'});
-      const now = new Date().getHours();
+      // Prefer today's actual peak if it was strong (4+ courts) and already happened
+      const useTodayPeak = todayPeakCount >= 4 && todayPeakHour <= now && todayPeakHour !== histPeakHour;
 
       let msg;
-      if (now < peakHour) {
-        msg = `<strong>${lbl}</strong> is usually the busiest time today (${peakAvg.toFixed(1)} avg courts). Get there early!`;
-      } else if (now === peakHour) {
-        msg = `<strong>Right now</strong> is typically peak time on ${DOW_SHORT[today]}s (${peakAvg.toFixed(1)} avg courts). Go go go!`;
+      if (useTodayPeak) {
+        const todayLbl = new Date(2026,0,1,todayPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
+        if (todayPeakHour === now) {
+          msg = `<strong>${todayLbl}</strong> is popping off right now (${todayPeakCount} courts). Get out there!`;
+        } else {
+          msg = `Today's peak was <strong>${todayLbl}</strong> (${todayPeakCount} courts in use).`;
+          if (histPeakHour > now) {
+            const histLbl = new Date(2026,0,1,histPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
+            msg += ` Another wave usually hits around <strong>${histLbl}</strong>.`;
+          }
+        }
+      } else if (histPeakHour >= 0 && histPeakAvg >= 3) {
+        const lbl = new Date(2026,0,1,histPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
+        if (now < histPeakHour) {
+          msg = `<strong>${lbl}</strong> is usually the busiest time today (${histPeakAvg.toFixed(1)} avg courts). Get there early!`;
+        } else if (now === histPeakHour) {
+          msg = `<strong>Right now</strong> is typically peak time on ${DOW_SHORT[today]}s (${histPeakAvg.toFixed(1)} avg courts). Go go go!`;
+        } else {
+          msg = `Peak time today was around <strong>${lbl}</strong> (${histPeakAvg.toFixed(1)} avg courts). Tomorrow's another day!`;
+        }
       } else {
-        msg = `Peak time today was around <strong>${lbl}</strong> (${peakAvg.toFixed(1)} avg courts). Tomorrow's another day!`;
+        el.style.display = 'none'; return;
       }
+
+      const peakVal = useTodayPeak ? todayPeakCount : histPeakAvg;
 
       // Find busiest day for social player context
       const busiest = getBusiestDay();
@@ -835,7 +868,7 @@
 
       el.style.display = 'flex';
       el.className = 'peak-banner';
-      el.innerHTML = `<div class="peak-icon">${peakAvg >= 4 ? '🔥' : '📊'}</div><div class="peak-text">${msg}${busiestHtml}</div>`;
+      el.innerHTML = `<div class="peak-icon">${peakVal >= 4 ? '🔥' : '📊'}</div><div class="peak-text">${msg}${busiestHtml}</div>`;
     }
 
     function renderHotTimesSummary() {
@@ -862,14 +895,23 @@
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
           const avg = v.reduce((a,b)=>a+b,0)/v.length;
-          if (avg >= 4) {
+          if (avg >= 3) {
             const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-            const intensity = Math.min((avg - 3) / 3, 1);
+            const isHot = avg >= 4;
             const isWeekPeak = weekPeakAvg > 0 && Math.abs(avg - weekPeakAvg) < 0.01;
-            const peakStyle = isWeekPeak
-              ? `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`
-              : `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
-            html += `<div class="hot-time" style="${peakStyle}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
+            let style;
+            if (isWeekPeak) {
+              const intensity = Math.min((avg - 3) / 3, 1);
+              style = `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`;
+            } else if (isHot) {
+              const intensity = Math.min((avg - 3) / 3, 1);
+              style = `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
+            } else {
+              // Warm tier: 3.0-3.9 avg — shows as lighter/muted
+              style = `background:rgba(45,106,79,0.04); color:var(--text-secondary); border: 1px dashed rgba(45,106,79,0.25)`;
+            }
+            const tierLabel = isHot ? avg.toFixed(1) + ' avg' : avg.toFixed(1) + ' avg';
+            html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${tierLabel}</span></div>`;
             dayHot = true; hasAny = true;
           }
         }
@@ -925,7 +967,7 @@
         updateCurrentStatus(todayData);
         renderChart(todayData);
         buildDayPicker(index, async (d) => { currentChartDate=d; const data=await loadDay(d); renderChart(data); if(d===index.dates[0]) updateCurrentStatus(data); });
-        computeBestTimes(index);
+        computeBestTimes(index, todayData);
       } else { updateCurrentStatus([]); }
     }
 
