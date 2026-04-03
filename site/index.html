@@ -868,7 +868,7 @@
             msg += ` Another wave usually hits around <strong>${histLbl}</strong>.`;
           }
         }
-      } else if (histPeakHour >= 0 && histPeakAvg >= 3) {
+      } else if (histPeakHour >= 0 && histPeakAvg >= 4) {
         const lbl = new Date(2026,0,1,histPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
         if (now < histPeakHour) {
           msg = `<strong>${lbl}</strong> is usually the busiest time today (${histPeakAvg.toFixed(1)} avg courts). Get there early!`;
@@ -918,12 +918,12 @@
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
           const avg = btAvg(v);
-          if (avg >= 3) slots.push({ hour, avg });
+          if (avg >= 4) slots.push({ hour, avg });
         }
-        // Merge consecutive hours into ranges, but only within the same tier
+        // Merge consecutive hours into ranges, split at medium/dark tier boundary
         const ranges = [];
         for (const slot of slots) {
-          const tier = slot.avg >= 4 ? 'hot' : 'warm';
+          const tier = slot.avg >= 5 ? 'dark' : 'medium';
           const prev = ranges[ranges.length - 1];
           if (prev && slot.hour === prev.endHour + 1 && prev.tier === tier) {
             prev.endHour = slot.hour;
@@ -939,17 +939,12 @@
           const startLbl = new Date(2026,0,1,r.startHour).toLocaleTimeString('en-US',{hour:'numeric'});
           const endLbl = new Date(2026,0,1,r.endHour + 1).toLocaleTimeString('en-US',{hour:'numeric'});
           const lbl = r.startHour === r.endHour ? startLbl : `${startLbl}-${endLbl}`;
-          const isHot = r.maxAvg >= 4;
-          const isWeekPeak = weekPeakAvg > 0 && r.maxAvg >= weekPeakAvg - 0.01;
+          const isDark = r.maxAvg >= 5;
           let style;
-          if (isWeekPeak) {
-            const intensity = Math.min((r.maxAvg - 3) / 3, 1);
-            style = `background:rgba(45,106,79,${0.15 + intensity * 0.1}); color:var(--green); font-weight:700; box-shadow: 0 0 0 1.5px var(--green)`;
-          } else if (isHot) {
-            const intensity = Math.min((r.maxAvg - 3) / 3, 1);
-            style = `background:rgba(45,106,79,${0.06 + intensity * 0.14}); color:var(--green)`;
+          if (isDark) {
+            style = `background:rgba(45,106,79,0.18); color:var(--green); font-weight:700`;
           } else {
-            style = `background:rgba(45,106,79,0.04); color:var(--text-secondary); border: 1px dashed rgba(45,106,79,0.25)`;
+            style = `background:rgba(45,106,79,0.08); color:var(--green)`;
           }
           html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
           dayHot = true; hasAny = true;
