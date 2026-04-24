@@ -676,13 +676,13 @@
       return runs[0];
     }
 
-    // Human phrasing for how busy a window usually gets.
+    // Short phrasing for how busy a window gets.
     // There are only 6 courts total, so "6+" is nonsense -- cap at "all 6 courts".
     function windowMeta(maxMedian, muted) {
       const n = Math.floor(maxMedian);
-      if (muted) return `usually ${n} court${n===1?'':'s'}`;
-      if (n >= 6) return `usually all 6 courts`;
-      return `usually ${n}+ courts`;
+      if (muted) return `${n} court${n===1?'':'s'}`;
+      if (n >= 6) return `all 6 courts`;
+      return `${n}+ courts`;
     }
 
     function renderBestToday() {
