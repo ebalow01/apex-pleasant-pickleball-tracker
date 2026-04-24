@@ -6,8 +6,6 @@
   <title>Pleasant Park Pickleball - Court Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   <style>
     :root {
       --bg: #f8faf6;
@@ -263,128 +261,54 @@
       font-size: 0.8rem;
     }
 
-    /* ========= BEST TIMES ========= */
-    .peak-banner {
-      background: var(--green-soft); border: 1px solid var(--accent);
-      border-radius: var(--radius-sm); padding: 0.75rem 1rem;
-      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;
+    /* ========= BEST TODAY (hero answer) ========= */
+    .best-today-line {
+      font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700;
+      line-height: 1.25; letter-spacing: -0.02em;
     }
-    .peak-banner .peak-icon {
-      font-size: 1.5rem; flex-shrink: 0;
+    .best-today-line strong {
+      color: var(--accent); font-weight: 800;
     }
-    .peak-banner .peak-text { font-size: 0.85rem; }
-    .peak-banner .peak-text strong { color: var(--accent); }
+    .best-today-meta {
+      font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.35rem;
+    }
+    .best-today.muted .best-today-line strong { color: var(--text-secondary); }
+    .best-today.quiet .best-today-line { font-size: 1.15rem; color: var(--text-secondary); }
 
-    .hot-times-grid {
-      display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 0.35rem; width: 100%;
+    /* ========= THIS WEEK (one row per day) ========= */
+    .week-list {
+      display: flex; flex-direction: column; gap: 0.35rem;
     }
-    @media (max-width: 600px) {
-      .hot-times-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.5rem 0.35rem;
-      }
+    .week-row {
+      display: grid; grid-template-columns: 3.25rem 1fr auto;
+      align-items: center; gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      background: var(--surface-raised);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid transparent;
+      border-radius: var(--radius-sm);
     }
-
-    .hot-day-col { display: flex; flex-direction: column; gap: 0.25rem; }
-    .hot-day-col .day-header {
-      font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
-      text-align: center; padding-bottom: 0.25rem;
-      text-transform: uppercase; letter-spacing: 0.05em;
+    .week-row.today {
+      border-left-color: var(--accent);
+      background: var(--green-soft);
     }
-    .hot-day-col-today .day-header { color: var(--accent); font-weight: 700; }
-
-    .hot-day-col .hot-time {
-      text-align: center; padding: 0.3rem 0.15rem; border-radius: 6px;
-      font-size: 0.75rem; font-weight: 500;
+    .week-row.today .week-day { color: var(--accent); font-weight: 800; }
+    .week-day {
+      font-family: 'Outfit', sans-serif; font-size: 0.8rem; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
     }
-    .hot-day-col .no-hot {
-      text-align: center; padding: 0.3rem 0.15rem; color: var(--text-muted);
-      font-size: 0.7rem; font-style: italic;
+    .week-window {
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--text);
     }
-
-    .detail-toggle {
-      background: none; border: 1px solid var(--border); color: var(--text-secondary);
-      padding: 0.4rem 0.85rem; border-radius: 100px; cursor: pointer;
-      font-size: 0.75rem; font-family: inherit; transition: all 0.2s;
+    .week-meta {
+      font-size: 0.8rem; color: var(--text-secondary); text-align: right;
+      white-space: nowrap;
     }
-    .detail-toggle:hover { border-color: var(--accent); color: var(--accent); }
-    .detail-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-    .best-times-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 0.4rem;
-    }
-    .time-slot {
-      padding: 0.5rem 0.4rem; border-radius: 8px; text-align: center; font-size: 0.8rem;
-    }
-    .time-hot { background: var(--green-soft); color: var(--green); border-left: 3px solid var(--green); font-weight: 600; }
-    .time-warm { background: rgba(45,106,79,0.04); color: var(--accent); border-left: 3px solid var(--accent); }
-    .time-cold { background: var(--surface-raised); color: var(--text-muted); border-left: 3px solid var(--border); }
-
-    .time-slot.expanded {
-      grid-column: 1 / -1; text-align: left;
-      padding: 0.75rem;
-    }
-    .time-slot.expanded > .slot-summary { display: none; }
-    .drill-down {
-      display: flex; flex-direction: column; gap: 0.25rem;
-    }
-    .drill-row {
-      display: flex; align-items: center; gap: 0.5rem;
-      padding: 0.3rem 0.25rem; font-size: 0.75rem;
-      border-radius: 4px;
-    }
-    .drill-row:nth-child(odd) { background: var(--bg); }
-    .drill-date { width: 3.5rem; color: var(--text-muted); font-size: 0.75rem; flex-shrink: 0; }
-    .drill-pips { display: flex; gap: 3px; align-items: center; }
-    .drill-count { color: var(--text-secondary); font-weight: 600; font-size: 0.75rem; margin-left: auto; }
-
-    /* ========= DAY/DOW PICKERS ========= */
-    .pill-picker {
-      display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto;
-      scrollbar-width: none; -webkit-overflow-scrolling: touch;
-    }
-    .pill-picker::-webkit-scrollbar { display: none; }
-    .pill-picker-wrap {
-      position: relative;
-    }
-    .pill-picker-wrap::after {
-      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 24px;
-      background: linear-gradient(to right, transparent, var(--surface));
-      pointer-events: none; opacity: 0; transition: opacity 0.2s;
-    }
-    .pill-picker-wrap.has-overflow::after { opacity: 1; }
-    .pill-btn {
-      background: var(--surface-raised); border: 1px solid var(--border-subtle);
-      color: var(--text-secondary); padding: 0.35rem 0.8rem; min-height: 36px;
-      border-radius: 100px; cursor: pointer; font-size: 0.75rem; font-weight: 500;
-      font-family: inherit; white-space: nowrap; display: inline-flex;
-      align-items: center; transition: all 0.2s;
-    }
-    @media (max-width: 600px) { .pill-btn { min-height: 40px; padding: 0.4rem 0.85rem; } }
-    .pill-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .pill-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .pill-btn.active {
-      background: var(--accent); border-color: var(--accent); color: #fff;
-      box-shadow: 0 2px 8px var(--accent-glow);
-    }
-
-    /* ========= CHART ========= */
-    .chart-label {
-      font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.35rem;
-      display: flex; align-items: center; gap: 0.35rem;
-    }
-    .chart-label-dot {
-      width: 8px; height: 3px; border-radius: 2px; background: var(--accent);
-    }
-    .chart-container { position: relative; height: 200px; }
-    @media (min-width: 768px) { .chart-container { height: 260px; } }
-
-    /* ========= DAILY BREAKDOWN ========= */
-    .daily-detail { margin-top: 0.75rem; }
-    .dow-picker { display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 0.5rem; }
-    .dow-picker::-webkit-scrollbar { display: none; }
+    .week-row.muted .week-window { color: var(--text-secondary); font-weight: 600; }
+    .week-row.muted .week-meta { color: var(--text-muted); }
+    .week-row.quiet .week-window { color: var(--text-muted); font-weight: 500; font-style: italic; }
+    .week-row.quiet .week-meta { display: none; }
 
     /* ========= UTILITY ========= */
     .no-data-msg { color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 1rem; }
@@ -438,41 +362,33 @@
       <div class="loading">Loading...</div>
     </div>
 
-    <!-- Best Times Card -->
+    <!-- Best time today -->
     <div class="card animate-in">
       <div class="card-header">
         <div class="card-title">
           <div class="card-icon" style="background: var(--green-soft); color: var(--accent);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          Best Times for Open Play
+          When to go
         </div>
-        <button id="detail-toggle" class="detail-toggle" style="display: none;">Daily breakdown</button>
       </div>
-      <div id="peak-banner" style="display: none;"></div>
-      <div id="hot-times-summary">
-        <div class="loading">Collecting data...</div>
-      </div>
-      <div id="daily-detail" class="daily-detail" style="display: none;">
-        <div id="dow-picker" class="dow-picker pill-picker" role="tablist" aria-label="Select day of week"></div>
-        <div id="best-times" class="best-times-grid" style="margin-top: 0.5rem;"></div>
+      <div id="best-today" class="best-today">
+        <div class="loading">Looking at the last few weeks...</div>
       </div>
     </div>
 
-    <!-- Today's Action Chart -->
+    <!-- This week at a glance -->
     <div class="card animate-in">
       <div class="card-header">
         <div class="card-title">
-          <div class="card-icon" style="background: var(--hot-soft); color: var(--hot);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <div class="card-icon" style="background: var(--green-soft); color: var(--accent);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
-          Today's Action
+          Best time each day
         </div>
-        <div class="pill-picker-wrap"><div id="day-picker" class="pill-picker" role="tablist" aria-label="Select day"></div></div>
       </div>
-      <div class="chart-label"><span class="chart-label-dot"></span> Courts in use throughout the day</div>
-      <div class="chart-container">
-        <canvas id="history-chart"></canvas>
+      <div id="this-week">
+        <div class="loading">Collecting data...</div>
       </div>
     </div>
 
@@ -483,7 +399,6 @@
 
   <script>
     const API_BASE = '/api/court-data';
-    let chart = null;
 
     const ICONS = {
       trendUp: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
@@ -497,19 +412,7 @@
       document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     }
     applyAutoTheme();
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      applyAutoTheme();
-      if (chart) updateChartColors();
-    });
-
-    function updateChartColors() {
-      const s = getComputedStyle(document.documentElement);
-      chart.options.scales.x.ticks.color = s.getPropertyValue('--chart-tick').trim();
-      chart.options.scales.y.ticks.color = s.getPropertyValue('--chart-tick').trim();
-      chart.options.scales.x.grid.color = s.getPropertyValue('--chart-grid').trim();
-      chart.options.scales.y.grid.color = s.getPropertyValue('--chart-grid').trim();
-      chart.update();
-    }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAutoTheme);
 
     // Share
     document.getElementById('share-btn').addEventListener('click', async () => {
@@ -586,32 +489,12 @@
         if (hour <= currentHour) continue;
         const v = hd[hour]; if (!v.length) continue;
         const avg = btMedian(v);
-        if (avg >= 4) {
+        if (avg >= 5) {
           const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
           return `Usually picks up around ${lbl}`;
         }
       }
       return '';
-    }
-
-    // Find the busiest day of the week overall
-    function getBusiestDay() {
-      if (!bestTimesData) return null;
-      let bestDay = -1, bestScore = 0;
-      for (let d = 0; d < 7; d++) {
-        const hd = bestTimesData[d];
-        let dayTotal = 0, dayCount = 0;
-        for (const hour of Object.keys(hd).map(Number)) {
-          const v = hd[hour]; if (!v.length) continue;
-          const avg = btMedian(v);
-          dayTotal += avg; dayCount++;
-        }
-        if (dayCount > 0 && dayTotal / dayCount > bestScore) {
-          bestScore = dayTotal / dayCount; bestDay = d;
-        }
-      }
-      if (bestDay < 0 || bestScore < 2) return null;
-      return { day: bestDay, name: DOW_NAMES[bestDay], avg: bestScore };
     }
 
     // Vibe card rendering
@@ -716,67 +599,6 @@
       `;
     }
 
-    // Chart
-    function renderChart(readings) {
-      const ctx = document.getElementById('history-chart').getContext('2d');
-      const labels = readings.map(r => new Date(r.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
-      const occupied = readings.map(r => r.occupied_count);
-      const s = getComputedStyle(document.documentElement);
-      const accentColor = s.getPropertyValue('--accent').trim();
-      const hotColor = s.getPropertyValue('--hot').trim();
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: { labels, datasets: [{
-          label: 'Courts in use', data: occupied,
-          borderColor: accentColor,
-          backgroundColor: s.getPropertyValue('--accent-glow').trim(),
-          fill: true, tension: 0.35,
-          pointRadius: 2, pointHoverRadius: 5,
-          pointBackgroundColor: accentColor,
-          borderWidth: 2.5,
-        }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          interaction: { intersect: false, mode: 'index' },
-          plugins: {
-            legend: { display: false },
-            annotation: { annotations: { threshold: {
-              type: 'line', yMin: 4, yMax: 4,
-              borderColor: hotColor + '66', borderWidth: 1.5, borderDash: [6, 4],
-              label: { display: true, content: 'Open play zone', position: 'start',
-                backgroundColor: 'transparent', color: hotColor,
-                font: { size: 10, family: 'Inter', weight: '500' }, padding: { top: 2, bottom: 2 } },
-            } } },
-            tooltip: {
-              backgroundColor: isDark ? '#1c2e1c' : '#ffffff',
-              titleColor: isDark ? '#d4e8d4' : '#1a2e1a',
-              bodyColor: isDark ? '#a3c4a3' : '#3d5a3d',
-              borderColor: isDark ? '#2a3d2a' : '#e2e8de',
-              borderWidth: 1, cornerRadius: 8, padding: 10,
-              titleFont: { weight: '600' },
-              callbacks: { label: ctx => `${ctx.parsed.y} of 6 courts` }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: s.getPropertyValue('--chart-tick').trim(), font: { size: 11 }, maxRotation: 0, autoSkipPadding: 20 },
-              grid: { color: s.getPropertyValue('--chart-grid').trim() },
-              border: { display: false }
-            },
-            y: {
-              min: 0, max: 6,
-              ticks: { color: s.getPropertyValue('--chart-tick').trim(), stepSize: 1, font: { size: 11 } },
-              grid: { color: s.getPropertyValue('--chart-grid').trim() },
-              border: { display: false }
-            },
-          },
-        },
-      });
-    }
-
     // Best times
     const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -808,243 +630,140 @@
         }
       }
 
-      renderPeakBanner();
-      renderHotTimesSummary();
-
-      const picker = document.getElementById('dow-picker');
-      const today = new Date().getDay();
-      picker.innerHTML = DOW_SHORT.map((n,i) => `<button class="pill-btn ${i===today?'active':''}" data-dow="${i}">${n}</button>`).join('');
-      picker.querySelectorAll('.pill-btn').forEach(b => b.addEventListener('click', () => {
-        picker.querySelectorAll('.pill-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active'); renderBestTimes(parseInt(b.dataset.dow));
-      }));
-      renderBestTimes(today);
-
-      const toggleBtn = document.getElementById('detail-toggle'), detailDiv = document.getElementById('daily-detail');
-      toggleBtn.style.display = 'inline-block';
-      toggleBtn.addEventListener('click', () => {
-        const showing = detailDiv.style.display !== 'none';
-        detailDiv.style.display = showing ? 'none' : 'block';
-        toggleBtn.textContent = showing ? 'Daily breakdown' : 'Hide breakdown';
-      });
+      renderBestToday();
+      renderThisWeek();
     }
 
-    function renderPeakBanner() {
-      const el = document.getElementById('peak-banner');
-      if (!bestTimesData) { el.style.display = 'none'; return; }
+    // Format a single hour label like "8 AM" or a range like "6 - 8 PM" (end is exclusive-end hour).
+    function formatWindow(startHour, endHour) {
+      const startLbl = new Date(2026,0,1,startHour).toLocaleTimeString('en-US',{hour:'numeric'});
+      if (startHour === endHour) return startLbl;
+      const endLbl = new Date(2026,0,1,endHour + 1).toLocaleTimeString('en-US',{hour:'numeric'});
+      return `${startLbl}–${endLbl}`;
+    }
 
-      const now = new Date().getHours();
-
-      // Find today's ACTUAL peak from live readings
-      let todayPeakHour = -1, todayPeakCount = 0;
-      if (todayReadings && todayReadings.length > 0) {
-        const hourMax = {};
-        for (const r of todayReadings) {
-          const h = new Date(r.timestamp).getHours();
-          if (!hourMax[h] || r.occupied_count > hourMax[h]) hourMax[h] = r.occupied_count;
-        }
-        for (const [h, count] of Object.entries(hourMax)) {
-          if (count > todayPeakCount) { todayPeakCount = count; todayPeakHour = parseInt(h); }
-        }
-      }
-
-      // Find historical peak time for today's day-of-week
-      const today = new Date().getDay();
-      const hd = bestTimesData[today];
-      let histPeakHour = -1, histPeakAvg = 0;
-      for (const hour of Object.keys(hd).map(Number)) {
-        const v = hd[hour]; if (!v.length) continue;
-        const avg = btMedian(v);
-        if (avg > histPeakAvg) { histPeakAvg = avg; histPeakHour = hour; }
-      }
-
-      // Prefer today's actual peak if it was strong (4+ courts) and already happened
-      const useTodayPeak = todayPeakCount >= 4 && todayPeakHour <= now && todayPeakHour !== histPeakHour;
-
-      let msg;
-      if (useTodayPeak) {
-        const todayLbl = new Date(2026,0,1,todayPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
-        if (todayPeakHour === now) {
-          msg = `<strong>${todayLbl}</strong> is popping off right now (${todayPeakCount} courts). Get out there!`;
-        } else {
-          msg = `Today's peak was <strong>${todayLbl}</strong> (${todayPeakCount} courts in use).`;
-          if (histPeakHour > now) {
-            const histLbl = new Date(2026,0,1,histPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
-            msg += ` Another wave usually hits around <strong>${histLbl}</strong>.`;
+    // Given a day's hour->entries map, find the longest consecutive run of hours
+    // whose median >= threshold, starting at or after fromHour. Tie-breakers: higher
+    // maxMedian, then earlier start. Returns {startHour, endHour, maxMedian} or null.
+    function findBestWindow(hd, threshold, fromHour = 0) {
+      const hours = Object.keys(hd).map(Number).sort((a,b) => a-b);
+      let runs = [];
+      let current = null;
+      for (const h of hours) {
+        if (h < fromHour) continue;
+        const v = hd[h];
+        if (v.length && btMedian(v) >= threshold) {
+          const med = btMedian(v);
+          if (current && h === current.endHour + 1) {
+            current.endHour = h;
+            current.maxMedian = Math.max(current.maxMedian, med);
+          } else {
+            if (current) runs.push(current);
+            current = { startHour: h, endHour: h, maxMedian: med };
           }
+        } else if (current) {
+          runs.push(current); current = null;
         }
-      } else if (histPeakHour >= 0 && histPeakAvg >= 4) {
-        const lbl = new Date(2026,0,1,histPeakHour).toLocaleTimeString('en-US',{hour:'numeric'});
-        if (now < histPeakHour) {
-          msg = `<strong>${lbl}</strong> is usually the busiest time today (${histPeakAvg.toFixed(1)} avg courts). Get there early!`;
-        } else if (now === histPeakHour) {
-          msg = `<strong>Right now</strong> is typically peak time on ${DOW_SHORT[today]}s (${histPeakAvg.toFixed(1)} avg courts). Go go go!`;
-        } else {
-          msg = `Peak time today was around <strong>${lbl}</strong> (${histPeakAvg.toFixed(1)} avg courts). Tomorrow's another day!`;
-        }
-      } else {
-        el.style.display = 'none'; return;
       }
-
-      const peakVal = useTodayPeak ? todayPeakCount : histPeakAvg;
-
-      // Find busiest day for social player context
-      const busiest = getBusiestDay();
-      const busiestHtml = busiest ? `<div style="font-size:0.75rem;margin-top:0.35rem;opacity:0.8">${busiest.name}s tend to be the busiest day of the week</div>` : '';
-
-      el.style.display = 'flex';
-      el.className = 'peak-banner';
-      el.innerHTML = `<div class="peak-icon">${peakVal >= 4 ? '🔥' : '📊'}</div><div class="peak-text">${msg}${busiestHtml}</div>`;
+      if (current) runs.push(current);
+      if (!runs.length) return null;
+      runs.sort((a,b) => {
+        const la = a.endHour - a.startHour, lb = b.endHour - b.startHour;
+        if (lb !== la) return lb - la;
+        if (b.maxMedian !== a.maxMedian) return b.maxMedian - a.maxMedian;
+        return a.startHour - b.startHour;
+      });
+      return runs[0];
     }
 
-    function renderHotTimesSummary() {
-      const c = document.getElementById('hot-times-summary');
-      if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
-      const today = new Date().getDay();
+    // Human phrasing for how busy a window usually gets
+    function windowMeta(maxMedian, muted) {
+      const n = Math.floor(maxMedian);
+      if (muted) return `usually ${n} court${n===1?'':'s'}`;
+      return `usually ${n}+ courts`;
+    }
 
-      // Find the week's single hottest slot to highlight it
-      let weekPeakAvg = 0;
+    function renderBestToday() {
+      const el = document.getElementById('best-today');
+      if (!bestTimesData) { el.innerHTML = '<div class="loading">Looking at the last few weeks...</div>'; return; }
+
+      const now = new Date();
+      const today = now.getDay();
+      const currentHour = now.getHours();
+      const hd = bestTimesData[today];
+
+      // Off-hours: show tomorrow's best directly
+      if (isOffHours()) {
+        const tomorrow = (today + 1) % 7;
+        const th = bestTimesData[tomorrow];
+        const best = findBestWindow(th, 5) || findBestWindow(th, 4);
+        if (best) {
+          const muted = best.maxMedian < 5;
+          el.className = 'best-today' + (muted ? ' muted' : '');
+          el.innerHTML = `<div class="best-today-line">Tomorrow's best: <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${DOW_NAMES[tomorrow]}, ${windowMeta(best.maxMedian, muted)}</div>`;
+        } else {
+          el.className = 'best-today quiet';
+          el.innerHTML = `<div class="best-today-line">Courts are sleeping.</div><div class="best-today-meta">Tracking resumes at 5 AM.</div>`;
+        }
+        return;
+      }
+
+      // Best remaining window today at >=5
+      let best = findBestWindow(hd, 5, currentHour);
+      if (best) {
+        el.className = 'best-today';
+        el.innerHTML = `<div class="best-today-line">Best time today: <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, false)}</div>`;
+        return;
+      }
+
+      // Softer fallback: >=4 still available today
+      best = findBestWindow(hd, 4, currentHour);
+      if (best) {
+        el.className = 'best-today muted';
+        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
+        return;
+      }
+
+      // Nothing worth it today -- peek tomorrow
+      const tomorrow = (today + 1) % 7;
+      const th = bestTimesData[tomorrow];
+      const tm = findBestWindow(th, 5) || findBestWindow(th, 4);
+      if (tm) {
+        const muted = tm.maxMedian < 5;
+        el.className = 'best-today muted';
+        el.innerHTML = `<div class="best-today-line">No busy window left today.</div><div class="best-today-meta">Tomorrow's best is usually <strong>${formatWindow(tm.startHour, tm.endHour)}</strong> (${windowMeta(tm.maxMedian, muted)}).</div>`;
+      } else {
+        el.className = 'best-today quiet';
+        el.innerHTML = `<div class="best-today-line">Usually quiet today.</div>`;
+      }
+    }
+
+    function renderThisWeek() {
+      const el = document.getElementById('this-week');
+      if (!bestTimesData) { el.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
+      const today = new Date().getDay();
+      const rows = [];
       for (let d = 0; d < 7; d++) {
         const hd = bestTimesData[d];
-        for (const hour of Object.keys(hd).map(Number)) {
-          const v = hd[hour]; if (!v.length) continue;
-          const avg = btMedian(v);
-          if (avg > weekPeakAvg) weekPeakAvg = avg;
-        }
-      }
-
-      let hasAny = false, html = '<div class="hot-times-grid">';
-      for (let d = 0; d < 7; d++) {
+        let best = findBestWindow(hd, 5);
+        let muted = false;
+        if (!best) { best = findBestWindow(hd, 4); muted = true; }
         const isToday = d === today;
-        html += `<div class="hot-day-col${isToday?' hot-day-col-today':''}"><div class="day-header">${DOW_SHORT[d]}${isToday?' *':''}</div>`;
-        const hd = bestTimesData[d]; let dayHot = false, dayData = false;
-        // Collect qualifying hours with their averages
-        const slots = [];
-        for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
-          const v = hd[hour]; if (!v.length) continue; dayData = true;
-          const avg = btMedian(v);
-          if (avg >= 4) slots.push({ hour, avg });
+        const cls = `week-row${isToday ? ' today' : ''}${!best ? ' quiet' : (muted ? ' muted' : '')}`;
+        if (best) {
+          rows.push(`<div class="${cls}"><div class="week-day">${DOW_SHORT[d]}</div><div class="week-window">${formatWindow(best.startHour, best.endHour)}</div><div class="week-meta">${windowMeta(best.maxMedian, muted)}</div></div>`);
+        } else {
+          rows.push(`<div class="${cls}"><div class="week-day">${DOW_SHORT[d]}</div><div class="week-window">Usually quiet</div><div class="week-meta"></div></div>`);
         }
-        // Merge consecutive hours into ranges, split at medium/dark tier boundary
-        const ranges = [];
-        for (const slot of slots) {
-          const tier = slot.avg >= 5 ? 'dark' : 'medium';
-          const prev = ranges[ranges.length - 1];
-          if (prev && slot.hour === prev.endHour + 1 && prev.tier === tier) {
-            prev.endHour = slot.hour;
-            prev.avgSum += slot.avg;
-            prev.count++;
-            prev.maxAvg = Math.max(prev.maxAvg, slot.avg);
-          } else {
-            ranges.push({ startHour: slot.hour, endHour: slot.hour, avgSum: slot.avg, count: 1, maxAvg: slot.avg, tier });
-          }
-        }
-        for (const r of ranges) {
-          const avg = r.avgSum / r.count;
-          const startLbl = new Date(2026,0,1,r.startHour).toLocaleTimeString('en-US',{hour:'numeric'});
-          const endLbl = new Date(2026,0,1,r.endHour + 1).toLocaleTimeString('en-US',{hour:'numeric'});
-          const lbl = r.startHour === r.endHour ? startLbl : `${startLbl}-${endLbl}`;
-          const isDark = r.maxAvg >= 5;
-          let style;
-          if (isDark) {
-            style = `background:rgba(45,106,79,0.18); color:var(--green); font-weight:700`;
-          } else {
-            style = `background:rgba(45,106,79,0.08); color:var(--green)`;
-          }
-          html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} typical</span></div>`;
-          dayHot = true; hasAny = true;
-        }
-        if (!dayHot) html += `<div class="no-hot">${dayData ? 'No peak' : 'No data'}</div>`;
-        html += '</div>';
       }
-      html += '</div>';
-      if (!hasAny) { c.innerHTML = '<div class="no-data-msg">No consistently busy times found yet -- more data needed.</div>'; return; }
-      c.innerHTML = html;
+      el.innerHTML = `<div class="week-list">${rows.join('')}</div>`;
     }
 
-    function renderBestTimes(dow) {
-      const c = document.getElementById('best-times');
-      if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
-      const hd = bestTimesData[dow];
-      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:btMedian(v),samples:v.length,readings:v}));
-      if (!entries.length) { c.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet.</div>`; return; }
-      c.innerHTML = entries.map(({hour,avg,samples})=>{
-        const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-        const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
-        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><span class="slot-summary"><strong>${lbl}</strong><br>${avg.toFixed(1)} typical<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></span></div>`;
-      }).join('');
-      // Click to drill down into individual readings
-      c.querySelectorAll('.time-slot[data-hour]').forEach(el => {
-        el.addEventListener('click', () => {
-          const hour = parseInt(el.dataset.hour);
-          const entry = entries.find(e => e.hour === hour);
-          if (!entry) return;
-          const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-          // Toggle: if already expanded, collapse
-          if (el.classList.contains('expanded')) {
-            el.classList.remove('expanded');
-            el.querySelector('.drill-down')?.remove();
-            return;
-          }
-          // Collapse any other open drill-downs
-          c.querySelectorAll('.time-slot.expanded').forEach(other => {
-            other.classList.remove('expanded');
-            other.querySelector('.drill-down')?.remove();
-          });
-          // Aggregate readings by date (max count per date for this hour)
-          const byDate = {};
-          for (const r of entry.readings) {
-            if (!byDate[r.date] || r.count > byDate[r.date]) byDate[r.date] = r.count;
-          }
-          const sorted = Object.entries(byDate).sort((a, b) => b[0].localeCompare(a[0]));
-          const dd = document.createElement('div');
-          dd.className = 'drill-down';
-          dd.innerHTML = `<div style="font-size:0.85rem;font-weight:600;margin-bottom:0.35rem">${lbl} — ${entry.avg.toFixed(1)} avg, ${sorted.length} ${DOW_NAMES[new Date().getDay()]}${sorted.length!==1?'s':''}</div>` +
-            sorted.map(([date, count]) => {
-            const dt = new Date(date + 'T12:00:00');
-            const dateLbl = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            const pips = Array.from({length: 6}, (_, i) =>
-              `<span style="display:inline-block;width:10px;height:5px;border-radius:2px;background:${i < count ? 'var(--accent)' : 'var(--border)'}"></span>`
-            ).join('');
-            return `<div class="drill-row"><span class="drill-date">${dateLbl}</span><span class="drill-pips">${pips}</span><span class="drill-count">${count}/6</span></div>`;
-          }).join('');
-          el.classList.add('expanded');
-          el.appendChild(dd);
-        });
-      });
-    }
-
-    function buildDayPicker(index, onSelect) {
-      const picker = document.getElementById('day-picker');
-      const dates = index.dates.slice(0, 7);
-      if (!dates.length) return;
-      picker.innerHTML = dates.map((d,i) => {
-        const dt = new Date(d+'T12:00:00');
-        const lbl = i===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-        return `<button class="pill-btn ${i===0?'active':''}" data-date="${d}">${lbl}</button>`;
-      }).join('');
-      picker.querySelectorAll('.pill-btn').forEach(b => b.addEventListener('click', () => {
-        picker.querySelectorAll('.pill-btn').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active'); onSelect(b.dataset.date);
-      }));
-      // Scroll overflow hint
-      const wrap = picker.parentElement;
-      if (wrap && wrap.classList.contains('pill-picker-wrap')) {
-        const check = () => wrap.classList.toggle('has-overflow', picker.scrollWidth > picker.clientWidth + 8 && picker.scrollLeft < picker.scrollWidth - picker.clientWidth - 8);
-        check(); picker.addEventListener('scroll', check, { passive: true });
-        new ResizeObserver(check).observe(picker);
-      }
-    }
-
-    let currentChartDate = null;
     async function init() {
       const index = await loadIndex();
       if (index.dates.length > 0) {
-        currentChartDate = index.dates[0];
         const todayData = await loadDay(index.dates[0]);
         updateCurrentStatus(todayData);
-        renderChart(todayData);
-        buildDayPicker(index, async (d) => { currentChartDate=d; const data=await loadDay(d); renderChart(data); if(d===index.dates[0]) updateCurrentStatus(data); });
         computeBestTimes(index, todayData);
       } else { updateCurrentStatus([]); }
     }
@@ -1054,9 +773,8 @@
       try {
         const index = await loadIndex();
         if (index.dates.length > 0) {
-          const td = index.dates[0], data = await loadDay(td);
+          const data = await loadDay(index.dates[0]);
           updateCurrentStatus(data);
-          if (currentChartDate === td) renderChart(data);
         }
       } catch {}
     }
