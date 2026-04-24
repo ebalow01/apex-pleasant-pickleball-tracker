@@ -585,7 +585,7 @@
       for (const hour of Object.keys(hd).map(Number).sort((a,b) => a-b)) {
         if (hour <= currentHour) continue;
         const v = hd[hour]; if (!v.length) continue;
-        const avg = btAvg(v);
+        const avg = btMedian(v);
         if (avg >= 4) {
           const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
           return `Usually picks up around ${lbl}`;
@@ -603,7 +603,7 @@
         let dayTotal = 0, dayCount = 0;
         for (const hour of Object.keys(hd).map(Number)) {
           const v = hd[hour]; if (!v.length) continue;
-          const avg = btAvg(v);
+          const avg = btMedian(v);
           dayTotal += avg; dayCount++;
         }
         if (dayCount > 0 && dayTotal / dayCount > bestScore) {
@@ -783,8 +783,13 @@
     let bestTimesData = null;
     let todayReadings = null; // store today's actual readings for peak comparison
 
-    // Helper: get average count from bestTimesData entries (which are {count, date} objects)
-    function btAvg(entries) { return entries.reduce((s, e) => s + e.count, 0) / entries.length; }
+    // Helper: get median count from bestTimesData entries (which are {count, date} objects).
+    // Median over mean dampens outlier days (rain, holidays) without needing weather/calendar data.
+    function btMedian(entries) {
+      const sorted = entries.map(e => e.count).sort((a, b) => a - b);
+      const n = sorted.length, mid = Math.floor(n / 2);
+      return n % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
 
     async function computeBestTimes(index, todayData) {
       todayReadings = todayData || null;
@@ -849,7 +854,7 @@
       let histPeakHour = -1, histPeakAvg = 0;
       for (const hour of Object.keys(hd).map(Number)) {
         const v = hd[hour]; if (!v.length) continue;
-        const avg = btAvg(v);
+        const avg = btMedian(v);
         if (avg > histPeakAvg) { histPeakAvg = avg; histPeakHour = hour; }
       }
 
@@ -903,7 +908,7 @@
         const hd = bestTimesData[d];
         for (const hour of Object.keys(hd).map(Number)) {
           const v = hd[hour]; if (!v.length) continue;
-          const avg = btAvg(v);
+          const avg = btMedian(v);
           if (avg > weekPeakAvg) weekPeakAvg = avg;
         }
       }
@@ -917,7 +922,7 @@
         const slots = [];
         for (const hour of Object.keys(hd).map(Number).sort((a,b)=>a-b)) {
           const v = hd[hour]; if (!v.length) continue; dayData = true;
-          const avg = btAvg(v);
+          const avg = btMedian(v);
           if (avg >= 4) slots.push({ hour, avg });
         }
         // Merge consecutive hours into ranges, split at medium/dark tier boundary
@@ -946,7 +951,7 @@
           } else {
             style = `background:rgba(45,106,79,0.08); color:var(--green)`;
           }
-          html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} avg</span></div>`;
+          html += `<div class="hot-time" style="${style}">${lbl}<br><span style="font-size:0.65rem;opacity:0.65">${avg.toFixed(1)} typical</span></div>`;
           dayHot = true; hasAny = true;
         }
         if (!dayHot) html += `<div class="no-hot">${dayData ? 'No peak' : 'No data'}</div>`;
@@ -961,12 +966,12 @@
       const c = document.getElementById('best-times');
       if (!bestTimesData) { c.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
       const hd = bestTimesData[dow];
-      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:btAvg(v),samples:v.length,readings:v}));
+      const entries = Object.entries(hd).filter(([_,v])=>v.length>0).map(([h,v])=>({hour:parseInt(h),avg:btMedian(v),samples:v.length,readings:v}));
       if (!entries.length) { c.innerHTML = `<div class="no-data-msg">No ${DOW_NAMES[dow]} data yet.</div>`; return; }
       c.innerHTML = entries.map(({hour,avg,samples})=>{
         const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
         const cls = avg>=4?'time-hot':avg>=2?'time-warm':'time-cold';
-        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><span class="slot-summary"><strong>${lbl}</strong><br>${avg.toFixed(1)} avg<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></span></div>`;
+        return `<div class="time-slot ${cls}" data-hour="${hour}" style="cursor:pointer"><span class="slot-summary"><strong>${lbl}</strong><br>${avg.toFixed(1)} typical<br><span style="font-size:0.7rem;opacity:0.65">${samples} reading${samples!==1?'s':''}</span></span></div>`;
       }).join('');
       // Click to drill down into individual readings
       c.querySelectorAll('.time-slot[data-hour]').forEach(el => {
