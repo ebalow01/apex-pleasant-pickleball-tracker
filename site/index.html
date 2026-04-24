@@ -478,23 +478,41 @@
 
     function isOffHours() { const h = new Date().getHours(); return h < 5 || h >= 22; }
 
-    // Find the next typically busy hour today (for low-activity hints)
+    // 15-minute slot utilities.
+    // A "slot" is an index 0..95 representing a 15-min block of the day
+    // (slot 0 = 12:00 AM, slot 20 = 5:00 AM, slot 87 = 9:45 PM).
+    // Readings are snapped to the NEAREST slot so timestamps that land a few
+    // minutes off the :00/:15/:30/:45 marks still bucket correctly.
+    const FIRST_SLOT = 20; // 5:00 AM
+    const LAST_SLOT = 87;  // 9:45 PM (inclusive)
+    const MIN_WINDOW_SLOTS = 2; // require 30-min minimum to call something a "best window"
+
+    function slotOfReading(ts) {
+      const d = new Date(ts);
+      return Math.round((d.getHours() * 60 + d.getMinutes()) / 15);
+    }
+    function currentSlot() {
+      const d = new Date();
+      return Math.floor((d.getHours() * 60 + d.getMinutes()) / 15);
+    }
+    // "6 PM" for on-the-hour slots, "6:15 PM" otherwise.
+    function slotToTime(slot) {
+      const total = slot * 15;
+      const h = Math.floor(total / 60), m = total % 60;
+      const d = new Date(2026, 0, 1, h, m);
+      return m === 0
+        ? d.toLocaleTimeString('en-US', { hour: 'numeric' })
+        : d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+
+    // Hint for the vibe card when things are quiet -- first slot today after
+    // now where a qualifying ≥5 run begins.
     function getNextBusyHint() {
       if (!bestTimesData) return '';
-      const now = new Date();
-      const today = now.getDay();
-      const currentHour = now.getHours();
-      const hd = bestTimesData[today];
-      for (const hour of Object.keys(hd).map(Number).sort((a,b) => a-b)) {
-        if (hour <= currentHour) continue;
-        const v = hd[hour]; if (!v.length) continue;
-        const avg = btMedian(v);
-        if (avg >= 5) {
-          const lbl = new Date(2026,0,1,hour).toLocaleTimeString('en-US',{hour:'numeric'});
-          return `Usually picks up around ${lbl}`;
-        }
-      }
-      return '';
+      const today = new Date().getDay();
+      const best = findBestWindow(bestTimesData[today], 5, currentSlot());
+      if (!best) return '';
+      return `Usually picks up around ${slotToTime(best.startSlot)}`;
     }
 
     // Vibe card rendering
@@ -502,22 +520,13 @@
       const card = document.getElementById('vibe-card');
 
       if (isOffHours()) {
-        // Show tomorrow's peak if available
+        // Show tomorrow's best window if available
         let tomorrowHint = '';
         if (bestTimesData) {
           const tomorrow = (new Date().getDay() + 1) % 7;
-          const hd = bestTimesData[tomorrow];
-          if (hd) {
-            let peakH = -1, peakA = 0;
-            for (const h of Object.keys(hd).map(Number)) {
-              const v = hd[h]; if (!v.length) continue;
-              const avg = v.reduce((a,b) => a+b,0) / v.length;
-              if (avg > peakA) { peakA = avg; peakH = h; }
-            }
-            if (peakH >= 0 && peakA >= 3) {
-              const lbl = new Date(2026,0,1,peakH).toLocaleTimeString('en-US',{hour:'numeric'});
-              tomorrowHint = `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem">Tomorrow's peak is usually around ${lbl}</div>`;
-            }
+          const best = findBestWindow(bestTimesData[tomorrow], 5) || findBestWindow(bestTimesData[tomorrow], 4);
+          if (best) {
+            tomorrowHint = `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem">Tomorrow's best is usually around ${slotToTime(best.startSlot)}</div>`;
           }
         }
         card.className = 'vibe-card state-closed animate-in';
@@ -616,7 +625,10 @@
     async function computeBestTimes(index, todayData) {
       todayReadings = todayData || null;
       bestTimesData = {};
-      for (let d = 0; d < 7; d++) { bestTimesData[d] = {}; for (let h = 5; h < 22; h++) bestTimesData[d][h] = []; }
+      for (let d = 0; d < 7; d++) {
+        bestTimesData[d] = {};
+        for (let s = FIRST_SLOT; s <= LAST_SLOT; s++) bestTimesData[d][s] = [];
+      }
       const datesToLoad = index.dates.slice(0, 28);
       const allData = await Promise.all(datesToLoad.map(d => loadDay(d)));
       for (let i = 0; i < datesToLoad.length; i++) {
@@ -625,8 +637,8 @@
         const dow = new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]), 12).getDay();
         for (const r of dd) {
           if (r.occupied_count === 0) continue;
-          const hour = new Date(r.timestamp).getHours();
-          if (bestTimesData[dow][hour] !== undefined) bestTimesData[dow][hour].push({ count: r.occupied_count, date: ds });
+          const slot = slotOfReading(r.timestamp);
+          if (bestTimesData[dow][slot] !== undefined) bestTimesData[dow][slot].push({ count: r.occupied_count, date: ds });
         }
       }
 
@@ -634,46 +646,47 @@
       renderThisWeek();
     }
 
-    // Format a single hour label like "8 AM" or a range like "6 - 8 PM" (end is exclusive-end hour).
-    function formatWindow(startHour, endHour) {
-      const startLbl = new Date(2026,0,1,startHour).toLocaleTimeString('en-US',{hour:'numeric'});
-      if (startHour === endHour) return startLbl;
-      const endLbl = new Date(2026,0,1,endHour + 1).toLocaleTimeString('en-US',{hour:'numeric'});
-      return `${startLbl}–${endLbl}`;
+    // Format a range of slots. endSlot is the last qualifying slot (inclusive);
+    // the window is considered to end at the start of the NEXT slot.
+    // Produces e.g. "6 PM–8 PM", "6:15 PM–8 PM", "10:45 AM–1 PM".
+    function formatWindow(startSlot, endSlot) {
+      return `${slotToTime(startSlot)}–${slotToTime(endSlot + 1)}`;
     }
 
-    // Given a day's hour->entries map, find the longest consecutive run of hours
-    // whose median >= threshold, starting at or after fromHour. Tie-breakers: higher
-    // maxMedian, then earlier start. Returns {startHour, endHour, maxMedian} or null.
-    function findBestWindow(hd, threshold, fromHour = 0) {
-      const hours = Object.keys(hd).map(Number).sort((a,b) => a-b);
-      let runs = [];
+    // Given a day's slot->entries map, find the longest consecutive run of slots
+    // whose median >= threshold, starting at or after fromSlot, with length
+    // >= minLen slots. Tie-breakers: higher maxMedian, then earlier start.
+    // Returns {startSlot, endSlot, maxMedian} or null.
+    function findBestWindow(hd, threshold, fromSlot = 0, minLen = MIN_WINDOW_SLOTS) {
+      const slots = Object.keys(hd).map(Number).sort((a,b) => a-b);
+      const runs = [];
       let current = null;
-      for (const h of hours) {
-        if (h < fromHour) continue;
-        const v = hd[h];
+      for (const s of slots) {
+        if (s < fromSlot) continue;
+        const v = hd[s];
         if (v.length && btMedian(v) >= threshold) {
           const med = btMedian(v);
-          if (current && h === current.endHour + 1) {
-            current.endHour = h;
+          if (current && s === current.endSlot + 1) {
+            current.endSlot = s;
             current.maxMedian = Math.max(current.maxMedian, med);
           } else {
             if (current) runs.push(current);
-            current = { startHour: h, endHour: h, maxMedian: med };
+            current = { startSlot: s, endSlot: s, maxMedian: med };
           }
         } else if (current) {
           runs.push(current); current = null;
         }
       }
       if (current) runs.push(current);
-      if (!runs.length) return null;
-      runs.sort((a,b) => {
-        const la = a.endHour - a.startHour, lb = b.endHour - b.startHour;
+      const qualified = runs.filter(r => (r.endSlot - r.startSlot + 1) >= minLen);
+      if (!qualified.length) return null;
+      qualified.sort((a,b) => {
+        const la = a.endSlot - a.startSlot, lb = b.endSlot - b.startSlot;
         if (lb !== la) return lb - la;
         if (b.maxMedian !== a.maxMedian) return b.maxMedian - a.maxMedian;
-        return a.startHour - b.startHour;
+        return a.startSlot - b.startSlot;
       });
-      return runs[0];
+      return qualified[0];
     }
 
     // Short phrasing for how busy a window gets.
@@ -689,9 +702,7 @@
       const el = document.getElementById('best-today');
       if (!bestTimesData) { el.innerHTML = '<div class="loading">Looking at the last few weeks...</div>'; return; }
 
-      const now = new Date();
-      const today = now.getDay();
-      const currentHour = now.getHours();
+      const today = new Date().getDay();
       const hd = bestTimesData[today];
 
       // Off-hours: show tomorrow's best directly
@@ -702,7 +713,7 @@
         if (best) {
           const muted = best.maxMedian < 5;
           el.className = 'best-today' + (muted ? ' muted' : '');
-          el.innerHTML = `<div class="best-today-line">Tomorrow's best: <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${DOW_NAMES[tomorrow]}, ${windowMeta(best.maxMedian, muted)}</div>`;
+          el.innerHTML = `<div class="best-today-line">Tomorrow's best: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${DOW_NAMES[tomorrow]}, ${windowMeta(best.maxMedian, muted)}</div>`;
         } else {
           el.className = 'best-today quiet';
           el.innerHTML = `<div class="best-today-line">Courts are sleeping.</div><div class="best-today-meta">Tracking resumes at 5 AM.</div>`;
@@ -710,19 +721,21 @@
         return;
       }
 
+      const cur = currentSlot();
+
       // Best remaining window today at >=5
-      let best = findBestWindow(hd, 5, currentHour);
+      let best = findBestWindow(hd, 5, cur);
       if (best) {
         el.className = 'best-today';
-        el.innerHTML = `<div class="best-today-line">Best time today: <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, false)}</div>`;
+        el.innerHTML = `<div class="best-today-line">Best time today: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, false)}</div>`;
         return;
       }
 
       // Softer fallback: >=4 still available today
-      best = findBestWindow(hd, 4, currentHour);
+      best = findBestWindow(hd, 4, cur);
       if (best) {
         el.className = 'best-today muted';
-        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startHour, best.endHour)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
+        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
         return;
       }
 
@@ -733,7 +746,7 @@
       if (tm) {
         const muted = tm.maxMedian < 5;
         el.className = 'best-today muted';
-        el.innerHTML = `<div class="best-today-line">No busy window left today.</div><div class="best-today-meta">Tomorrow's best is usually <strong>${formatWindow(tm.startHour, tm.endHour)}</strong> (${windowMeta(tm.maxMedian, muted)}).</div>`;
+        el.innerHTML = `<div class="best-today-line">No busy window left today.</div><div class="best-today-meta">Tomorrow's best is usually <strong>${formatWindow(tm.startSlot, tm.endSlot)}</strong> (${windowMeta(tm.maxMedian, muted)}).</div>`;
       } else {
         el.className = 'best-today quiet';
         el.innerHTML = `<div class="best-today-line">Usually quiet today.</div>`;
@@ -753,7 +766,7 @@
         const isToday = d === today;
         const cls = `week-row${isToday ? ' today' : ''}${!best ? ' quiet' : (muted ? ' muted' : '')}`;
         if (best) {
-          rows.push(`<div class="${cls}"><div class="week-day">${DOW_SHORT[d]}</div><div class="week-window">${formatWindow(best.startHour, best.endHour)}</div><div class="week-meta">${windowMeta(best.maxMedian, muted)}</div></div>`);
+          rows.push(`<div class="${cls}"><div class="week-day">${DOW_SHORT[d]}</div><div class="week-window">${formatWindow(best.startSlot, best.endSlot)}</div><div class="week-meta">${windowMeta(best.maxMedian, muted)}</div></div>`);
         } else {
           rows.push(`<div class="${cls}"><div class="week-day">${DOW_SHORT[d]}</div><div class="week-window">Usually quiet</div><div class="week-meta"></div></div>`);
         }
