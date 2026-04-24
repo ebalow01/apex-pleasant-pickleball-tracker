@@ -676,10 +676,12 @@
       return runs[0];
     }
 
-    // Human phrasing for how busy a window usually gets
+    // Human phrasing for how busy a window usually gets.
+    // There are only 6 courts total, so "6+" is nonsense -- cap at "all 6 courts".
     function windowMeta(maxMedian, muted) {
       const n = Math.floor(maxMedian);
       if (muted) return `usually ${n} court${n===1?'':'s'}`;
+      if (n >= 6) return `usually all 6 courts`;
       return `usually ${n}+ courts`;
     }
 
