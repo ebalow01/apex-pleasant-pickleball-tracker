@@ -139,6 +139,7 @@ export default async function handler() {
   return new Response("OK", { status: 200 });
 }
 
-export const config: Config = {
-  schedule: "*/15 * * * *",
-};
+// Schedule disabled -- data gathering paused. Existing 28+ days of history
+// are the benchmark used by the site. Re-add `schedule: "*/15 * * * *"` to
+// the Config below to resume polling.
+export const config: Config = {};

@@ -108,12 +108,9 @@
     .container { max-width: 680px; margin: 0 auto; padding: 0.75rem; }
     @media (min-width: 768px) { .container { padding: 1.5rem; } }
 
-    .icon { width: 1em; height: 1em; vertical-align: -0.125em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; display: inline-block; }
-    .icon-sm { width: 16px; height: 16px; }
-
     /* ========= HEADER ========= */
     .site-header {
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center;
       padding: 0.5rem 0; margin-bottom: 0.75rem;
     }
     .site-header .brand {
@@ -129,115 +126,6 @@
     }
     .site-header .brand-text p {
       font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.02em;
-    }
-    .icon-btn {
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-muted);
-      width: 36px; height: 36px; border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
-    }
-    .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-
-    /* ========= VIBE CARD - The main attraction ========= */
-    .vibe-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.5rem 1.25rem;
-      margin-bottom: 0.75rem; text-align: center;
-      box-shadow: var(--shadow-sm); transition: all 0.4s ease;
-      position: relative; overflow: hidden;
-    }
-    @media (min-width: 768px) { .vibe-card { padding: 2rem 1.5rem; } }
-
-    .vibe-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, var(--accent-glow) 0%, transparent 70%);
-      opacity: 0; transition: opacity 0.4s;
-    }
-
-    /* Type scale: 0.75 / 0.875 / 1 / 1.25 / 1.5 / 3 rem */
-    .vibe-card .verdict {
-      font-family: 'Outfit', sans-serif; font-size: 0.75rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      padding: 0.3rem 0.75rem; border-radius: 100px; display: inline-block;
-      margin-bottom: 0.75rem; position: relative;
-    }
-
-    .vibe-card .big-number {
-      font-family: 'Outfit', sans-serif; font-size: 3.5rem; font-weight: 900;
-      line-height: 1; letter-spacing: -0.04em; position: relative;
-    }
-    .vibe-card .big-number small {
-      font-size: 1.25rem; font-weight: 600; opacity: 0.5;
-    }
-
-    .vibe-card .headline {
-      font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700;
-      margin-top: 0.25rem; position: relative;
-    }
-    .vibe-card .subline {
-      font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.15rem;
-      position: relative;
-    }
-    .vibe-card .meta {
-      font-size: 0.75rem; color: var(--text-muted); margin-top: 0.75rem;
-      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      position: relative;
-    }
-    .vibe-card .trend { font-size: 0.875rem; position: relative; }
-
-    /* Vibe states */
-    .vibe-card.state-hot {
-      border-color: var(--hot);
-      box-shadow: 0 0 0 1px var(--hot), 0 4px 24px var(--hot-glow), inset 0 1px 0 var(--hot-soft);
-      background: linear-gradient(180deg, var(--hot-soft) 0%, var(--surface) 40%);
-    }
-    .vibe-card.state-hot::before { opacity: 1; background: radial-gradient(ellipse at 50% 0%, var(--hot-glow) 0%, transparent 60%); }
-    .vibe-card.state-hot .verdict { background: var(--hot-soft); color: var(--hot); }
-    .vibe-card.state-hot .big-number { color: var(--hot); }
-    @keyframes pulse-glow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 30px var(--hot-glow); } }
-    .vibe-card.state-hot .big-number { animation: pulse-glow 2s ease-in-out infinite; }
-
-    @keyframes hot-shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-    .vibe-card.state-hot::after {
-      content: ''; position: absolute; inset: 0; border-radius: inherit;
-      background: linear-gradient(90deg, transparent 0%, var(--hot-glow) 50%, transparent 100%);
-      background-size: 200% 100%; opacity: 0.3;
-      animation: hot-shimmer 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    .vibe-card.state-warm .verdict { background: var(--warm-soft); color: var(--warm); }
-    .vibe-card.state-warm .big-number { color: var(--warm); }
-    .vibe-card.state-warm { border-color: var(--warm); }
-    .vibe-card.state-warm::before { opacity: 0.5; background: radial-gradient(ellipse at 50% 0%, var(--warm-soft) 0%, transparent 70%); }
-
-    .vibe-card.state-chill .verdict { background: var(--green-soft); color: var(--accent); }
-    .vibe-card.state-chill .big-number { color: var(--accent); }
-
-    .vibe-card.state-empty .verdict { background: var(--surface-raised); color: var(--text-muted); }
-    .vibe-card.state-empty .big-number { color: var(--text-muted); }
-
-    .vibe-card.state-closed { opacity: 0.7; }
-    .vibe-card.state-closed .verdict { background: var(--surface-raised); color: var(--text-muted); }
-
-    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
-    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s ease-in-out infinite; }
-
-    /* ========= COURT MINI-MAP ========= */
-    .court-map {
-      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.375rem;
-      margin-top: 1rem; position: relative;
-    }
-    .court-pip {
-      height: 6px; border-radius: 3px; transition: all 0.3s ease;
-    }
-    .court-pip.active { background: var(--hot); }
-    .court-pip.open { background: var(--border); }
-    .state-hot .court-pip.active {
-      box-shadow: 0 0 6px var(--hot-glow);
     }
 
     /* ========= CARDS ========= */
@@ -260,20 +148,6 @@
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       font-size: 0.8rem;
     }
-
-    /* ========= BEST TODAY (hero answer) ========= */
-    .best-today-line {
-      font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700;
-      line-height: 1.25; letter-spacing: -0.02em;
-    }
-    .best-today-line strong {
-      color: var(--accent); font-weight: 800;
-    }
-    .best-today-meta {
-      font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.35rem;
-    }
-    .best-today.muted .best-today-line strong { color: var(--text-secondary); }
-    .best-today.quiet .best-today-line { font-size: 1.15rem; color: var(--text-secondary); }
 
     /* ========= THIS WEEK (one row per day) ========= */
     .week-list {
@@ -327,15 +201,6 @@
     .animate-in { animation: fadeIn 0.35s ease-out both; }
     .animate-in:nth-child(2) { animation-delay: 0.06s; }
     .animate-in:nth-child(3) { animation-delay: 0.12s; }
-    .animate-in:nth-child(4) { animation-delay: 0.16s; }
-
-    /* Court pips stagger */
-    .court-pip:nth-child(1) { animation: fadeIn 0.2s ease-out 0s both; }
-    .court-pip:nth-child(2) { animation: fadeIn 0.2s ease-out 0.03s both; }
-    .court-pip:nth-child(3) { animation: fadeIn 0.2s ease-out 0.06s both; }
-    .court-pip:nth-child(4) { animation: fadeIn 0.2s ease-out 0.09s both; }
-    .court-pip:nth-child(5) { animation: fadeIn 0.2s ease-out 0.12s both; }
-    .court-pip:nth-child(6) { animation: fadeIn 0.2s ease-out 0.15s both; }
   </style>
 </head>
 <body>
@@ -349,33 +214,10 @@
         </div>
         <div class="brand-text">
           <h1>Pleasant Park Pickleball</h1>
-          <p>Apex, NC &middot; Live court tracker</p>
+          <p>Apex, NC &middot; Best times to play</p>
         </div>
       </div>
-      <button class="icon-btn" id="share-btn" aria-label="Share">
-        <svg class="icon" width="18" height="18" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-      </button>
     </header>
-
-    <!-- Vibe Card - THE main thing -->
-    <div id="vibe-card" class="vibe-card state-closed animate-in" role="status" aria-live="polite">
-      <div class="loading">Loading...</div>
-    </div>
-
-    <!-- Best time today -->
-    <div class="card animate-in">
-      <div class="card-header">
-        <div class="card-title">
-          <div class="card-icon" style="background: var(--green-soft); color: var(--accent);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          When to go
-        </div>
-      </div>
-      <div id="best-today" class="best-today">
-        <div class="loading">Looking at the last few weeks...</div>
-      </div>
-    </div>
 
     <!-- This week at a glance -->
     <div class="card animate-in">
@@ -393,18 +235,12 @@
     </div>
 
     <footer>
-      Court data pulled from <a href="https://www.apexnc.org/1163/Pleasant-Park" target="_blank">Apex Parks</a> every 15 min, dawn to dusk.
+      Patterns based on past court usage at <a href="https://www.apexnc.org/1163/Pleasant-Park" target="_blank">Apex Parks</a>.
     </footer>
   </div>
 
   <script>
     const API_BASE = '/api/court-data';
-
-    const ICONS = {
-      trendUp: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
-      trendDown: '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>',
-      minus: '<svg class="icon icon-sm" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-    };
 
     // Auto-detect theme
     function applyAutoTheme() {
@@ -413,34 +249,6 @@
     }
     applyAutoTheme();
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAutoTheme);
-
-    // Share
-    document.getElementById('share-btn').addEventListener('click', async () => {
-      const card = document.getElementById('vibe-card');
-      const headline = card.querySelector('.headline');
-      const text = headline ? `Pleasant Park Pickleball -- ${headline.textContent}` : 'Pleasant Park Pickleball -- check the courts!';
-      const url = window.location.href;
-      const shareText = `${text}\n${url}`;
-
-      if (navigator.share) {
-        try { await navigator.share({ title: 'Pleasant Park Pickleball', text, url }); return; } catch {}
-      }
-
-      try {
-        await navigator.clipboard.writeText(shareText);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = shareText; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      }
-
-      const toast = document.createElement('div');
-      toast.textContent = 'Link copied!';
-      toast.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:0.5rem 1.25rem;border-radius:100px;font-size:0.85rem;font-weight:500;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.15);animation:fadeIn 0.3s ease-out';
-      document.body.appendChild(toast);
-      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 1500);
-      setTimeout(() => toast.remove(), 1800);
-    });
 
     // Data
     async function loadIndex() {
@@ -451,32 +259,6 @@
       try { const r = await fetch(`${API_BASE}/day/${d}`); if (!r.ok) return []; return await r.json(); }
       catch { return []; }
     }
-
-    // Relative time
-    let lastUpdateTime = null;
-    function relativeTime(date) {
-      const m = Math.floor((Date.now() - date.getTime()) / 60000);
-      if (m < 1) return 'just now';
-      if (m === 1) return '1 min ago';
-      if (m < 60) return `${m} min ago`;
-      return `${Math.floor(m/60)}h ${m%60}m ago`;
-    }
-    setInterval(() => {
-      if (!lastUpdateTime) return;
-      const el = document.getElementById('last-update-time');
-      if (el) el.textContent = relativeTime(lastUpdateTime);
-    }, 30000);
-
-    // Trend
-    function getTrend(readings) {
-      if (readings.length < 3) return '';
-      const r = readings.slice(-3).map(x => x.occupied_count);
-      if (r[r.length-1] > r[0]) return `${ICONS.trendUp} Trending up`;
-      if (r[r.length-1] < r[0]) return `${ICONS.trendDown} Winding down`;
-      return `${ICONS.minus} Holding steady`;
-    }
-
-    function isOffHours() { const h = new Date().getHours(); return h < 5 || h >= 22; }
 
     // 15-minute slot utilities.
     // A "slot" is an index 0..95 representing a 15-min block of the day
@@ -491,10 +273,6 @@
       const d = new Date(ts);
       return Math.round((d.getHours() * 60 + d.getMinutes()) / 15);
     }
-    function currentSlot() {
-      const d = new Date();
-      return Math.floor((d.getHours() * 60 + d.getMinutes()) / 15);
-    }
     // "6 PM" for on-the-hour slots, "6:15 PM" otherwise.
     function slotToTime(slot) {
       const total = slot * 15;
@@ -505,125 +283,18 @@
         : d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     }
 
-    // Hint for the vibe card when things are quiet -- first slot today after
-    // now where a qualifying ≥5 run begins.
-    function getNextBusyHint() {
-      if (!bestTimesData) return '';
-      const today = new Date().getDay();
-      const best = findBestWindow(bestTimesData[today], 5, currentSlot());
-      if (!best) return '';
-      return `Usually picks up around ${slotToTime(best.startSlot)}`;
-    }
-
-    // Vibe card rendering
-    function updateCurrentStatus(readings) {
-      const card = document.getElementById('vibe-card');
-
-      if (isOffHours()) {
-        // Show tomorrow's best window if available
-        let tomorrowHint = '';
-        if (bestTimesData) {
-          const tomorrow = (new Date().getDay() + 1) % 7;
-          const best = findBestWindow(bestTimesData[tomorrow], 5) || findBestWindow(bestTimesData[tomorrow], 4);
-          if (best) {
-            tomorrowHint = `<div style="font-size:0.8rem;color:var(--text-muted);margin-top:0.5rem">Tomorrow's best is usually around ${slotToTime(best.startSlot)}</div>`;
-          }
-        }
-        card.className = 'vibe-card state-closed animate-in';
-        card.innerHTML = `
-          <div class="verdict">After hours</div>
-          <div class="headline">Courts are sleeping</div>
-          <div class="subline">Tracking resumes at 5 AM</div>
-          ${tomorrowHint}
-        `;
-        return;
-      }
-
-      if (!readings || readings.length === 0) {
-        card.className = 'vibe-card state-closed animate-in';
-        card.innerHTML = `
-          <div class="verdict">Waiting</div>
-          <div class="headline">No data yet</div>
-          <div class="subline">Check back after the first poll runs</div>
-        `;
-        return;
-      }
-
-      const latest = readings[readings.length - 1];
-      const occupied = latest.occupied_count;
-      const ts = new Date(latest.timestamp);
-      lastUpdateTime = ts;
-      const trend = getTrend(readings);
-
-      // Sustained activity check
-      const recentHigh = readings.slice(-3);
-      const sustainedAt4Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 4);
-      const sustainedAt5Plus = recentHigh.length >= 2 && recentHigh.every(r => r.occupied_count >= 5);
-
-      // Get next busy time hint from best times data
-      const nextBusyHint = getNextBusyHint();
-
-      let state, verdict, headline, sub;
-      if (occupied >= 5 && sustainedAt5Plus) {
-        state = 'hot'; verdict = 'Get down here'; headline = 'Courts are packed!'; sub = 'Full rotation going -- this is the scene';
-      } else if (occupied >= 4 && sustainedAt4Plus) {
-        state = 'hot'; verdict = 'Come play'; headline = 'Open play is rolling'; sub = 'Been going strong -- jump in';
-      } else if (occupied >= 5) {
-        state = 'hot'; verdict = 'Come play'; headline = "It's ON"; sub = `${occupied} of 6 courts going right now`;
-      } else if (occupied === 4) {
-        state = 'hot'; verdict = 'Good time to go'; headline = 'Open play is live'; sub = 'Building momentum -- good time to roll up';
-      } else if (occupied === 3) {
-        state = 'warm'; verdict = 'Coin flip'; headline = 'A few games going'; sub = '3 courts active -- you might find a game or wait a bit';
-      } else if (occupied === 2) {
-        state = 'warm'; verdict = 'Warming up'; headline = 'A couple games going'; sub = nextBusyHint || 'Not quite open-play levels yet';
-      } else if (occupied === 1) {
-        state = 'chill'; verdict = 'Bring a friend'; headline = 'Just getting started'; sub = nextBusyHint || '1 court in use -- not enough for open play yet';
-      } else {
-        state = 'empty'; verdict = 'Wide open'; headline = 'Nobody out there'; sub = nextBusyHint || 'Courts are all yours if you want \'em';
-      }
-
-      // Build court pips
-      const courts = latest.courts || {};
-      let pipsHtml = '<div class="court-map">';
-      for (let i = 1; i <= 6; i++) {
-        const isActive = courts[`court_${i}`] === 'occupied';
-        pipsHtml += `<div class="court-pip ${isActive ? 'active' : 'open'}"></div>`;
-      }
-      pipsHtml += '</div>';
-
-      const trendHtml = trend ? `<div class="trend">${trend}</div>` : '';
-
-      card.className = `vibe-card state-${state} animate-in`;
-      card.innerHTML = `
-        <div class="verdict">${verdict}</div>
-        <div class="big-number">${occupied}<small>/6</small></div>
-        <div class="headline">${headline}</div>
-        <div class="subline">${sub}</div>
-        ${trendHtml}
-        ${pipsHtml}
-        <div class="meta">
-          <span class="live-dot"></span>
-          <span>Updated <span id="last-update-time">${relativeTime(ts)}</span></span>
-        </div>
-      `;
-    }
-
     // Best times
-    const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let bestTimesData = null;
-    let todayReadings = null; // store today's actual readings for peak comparison
 
-    // Helper: get median count from bestTimesData entries (which are {count, date} objects).
-    // Median over mean dampens outlier days (rain, holidays) without needing weather/calendar data.
+    // Median dampens outlier days (rain, holidays) without needing weather/calendar data.
     function btMedian(entries) {
       const sorted = entries.map(e => e.count).sort((a, b) => a - b);
       const n = sorted.length, mid = Math.floor(n / 2);
       return n % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
     }
 
-    async function computeBestTimes(index, todayData) {
-      todayReadings = todayData || null;
+    async function computeBestTimes(index) {
       bestTimesData = {};
       for (let d = 0; d < 7; d++) {
         bestTimesData[d] = {};
@@ -642,7 +313,6 @@
         }
       }
 
-      renderBestToday();
       renderThisWeek();
     }
 
@@ -698,61 +368,6 @@
       return `${n}+ courts`;
     }
 
-    function renderBestToday() {
-      const el = document.getElementById('best-today');
-      if (!bestTimesData) { el.innerHTML = '<div class="loading">Looking at the last few weeks...</div>'; return; }
-
-      const today = new Date().getDay();
-      const hd = bestTimesData[today];
-
-      // Off-hours: show tomorrow's best directly
-      if (isOffHours()) {
-        const tomorrow = (today + 1) % 7;
-        const th = bestTimesData[tomorrow];
-        const best = findBestWindow(th, 5) || findBestWindow(th, 4);
-        if (best) {
-          const muted = best.maxMedian < 5;
-          el.className = 'best-today' + (muted ? ' muted' : '');
-          el.innerHTML = `<div class="best-today-line">Tomorrow's best: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${DOW_NAMES[tomorrow]}, ${windowMeta(best.maxMedian, muted)}</div>`;
-        } else {
-          el.className = 'best-today quiet';
-          el.innerHTML = `<div class="best-today-line">Courts are sleeping.</div><div class="best-today-meta">Tracking resumes at 5 AM.</div>`;
-        }
-        return;
-      }
-
-      const cur = currentSlot();
-
-      // Best remaining window today at >=5
-      let best = findBestWindow(hd, 5, cur);
-      if (best) {
-        el.className = 'best-today';
-        el.innerHTML = `<div class="best-today-line">Best time today: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, false)}</div>`;
-        return;
-      }
-
-      // Softer fallback: >=4 still available today
-      best = findBestWindow(hd, 4, cur);
-      if (best) {
-        el.className = 'best-today muted';
-        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
-        return;
-      }
-
-      // Nothing worth it today -- peek tomorrow
-      const tomorrow = (today + 1) % 7;
-      const th = bestTimesData[tomorrow];
-      const tm = findBestWindow(th, 5) || findBestWindow(th, 4);
-      if (tm) {
-        const muted = tm.maxMedian < 5;
-        el.className = 'best-today muted';
-        el.innerHTML = `<div class="best-today-line">No busy window left today.</div><div class="best-today-meta">Tomorrow's best is usually <strong>${formatWindow(tm.startSlot, tm.endSlot)}</strong> (${windowMeta(tm.maxMedian, muted)}).</div>`;
-      } else {
-        el.className = 'best-today quiet';
-        el.innerHTML = `<div class="best-today-line">Usually quiet today.</div>`;
-      }
-    }
-
     function renderThisWeek() {
       const el = document.getElementById('this-week');
       if (!bestTimesData) { el.innerHTML = '<div class="no-data-msg">Collecting data...</div>'; return; }
@@ -777,25 +392,13 @@
     async function init() {
       const index = await loadIndex();
       if (index.dates.length > 0) {
-        const todayData = await loadDay(index.dates[0]);
-        updateCurrentStatus(todayData);
-        computeBestTimes(index, todayData);
-      } else { updateCurrentStatus([]); }
-    }
-
-    async function autoRefresh() {
-      if (document.visibilityState === 'hidden') return;
-      try {
-        const index = await loadIndex();
-        if (index.dates.length > 0) {
-          const data = await loadDay(index.dates[0]);
-          updateCurrentStatus(data);
-        }
-      } catch {}
+        computeBestTimes(index);
+      } else {
+        document.getElementById('this-week').innerHTML = '<div class="no-data-msg">No data yet.</div>';
+      }
     }
 
     init();
-    setInterval(autoRefresh, 300000);
   </script>
 </body>
 </html>
