@@ -289,6 +289,24 @@
       catch { return []; }
     }
 
+    // Apex, NC (ZIP 27502). Open-Meteo is free, key-less, CORS-allowed.
+    // Returns true if precip in the last 8 hours totals more than the
+    // "measurable" threshold (~0.01" / 0.254 mm). Fails open on network errors.
+    const APEX_LAT = 35.732, APEX_LON = -78.853;
+    async function recentRainAboveThreshold() {
+      try {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${APEX_LAT}&longitude=${APEX_LON}&hourly=precipitation&past_hours=8&forecast_hours=0&precipitation_unit=mm&timezone=America%2FNew_York`;
+        const r = await fetch(url);
+        if (!r.ok) return false;
+        const data = await r.json();
+        const hours = data?.hourly?.precipitation || [];
+        const total = hours.reduce((s, mm) => s + (Number(mm) || 0), 0);
+        return total > 0.254;
+      } catch {
+        return false;
+      }
+    }
+
     // 15-minute slot utilities.
     // A "slot" is an index 0..95 representing a 15-min block of the day
     // (slot 0 = 12:00 AM, slot 20 = 5:00 AM, slot 87 = 9:45 PM).
@@ -336,7 +354,10 @@
         for (let s = FIRST_SLOT; s <= LAST_SLOT; s++) bestTimesData[d][s] = [];
       }
       const datesToLoad = index.dates.slice(0, 28);
-      const allData = await Promise.all(datesToLoad.map(d => loadDay(d)));
+      const [allData, wet] = await Promise.all([
+        Promise.all(datesToLoad.map(d => loadDay(d))),
+        recentRainAboveThreshold(),
+      ]);
       for (let i = 0; i < datesToLoad.length; i++) {
         const ds = datesToLoad[i], dd = allData[i];
         const p = ds.split('-');
@@ -348,7 +369,7 @@
         }
       }
 
-      renderBestToday();
+      renderBestToday(wet);
       renderThisWeek();
     }
 
@@ -404,9 +425,15 @@
       return `${n}+ courts`;
     }
 
-    function renderBestToday() {
+    function renderBestToday(wet) {
       const el = document.getElementById('best-today');
       if (!bestTimesData) { el.innerHTML = '<div class="loading">Looking at the patterns...</div>'; return; }
+
+      if (wet) {
+        el.className = 'best-today muted';
+        el.innerHTML = `<div class="best-today-line">Courts might be wet.</div><div class="best-today-meta">Measurable rain in the past 8 hours -- check the surface before you play.</div>`;
+        return;
+      }
 
       const today = new Date().getDay();
       const hd = bestTimesData[today];
@@ -441,7 +468,7 @@
       best = findBestWindow(hd, 4, cur);
       if (best) {
         el.className = 'best-today muted';
-        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
+        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but possible</div>`;
         return;
       }
 
