@@ -149,6 +149,20 @@
       font-size: 0.8rem;
     }
 
+    /* ========= BEST TODAY (hero answer) ========= */
+    .best-today-line {
+      font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 700;
+      line-height: 1.25; letter-spacing: -0.02em;
+    }
+    .best-today-line strong {
+      color: var(--accent); font-weight: 800;
+    }
+    .best-today-meta {
+      font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.35rem;
+    }
+    .best-today.muted .best-today-line strong { color: var(--text-secondary); }
+    .best-today.quiet .best-today-line { font-size: 1.15rem; color: var(--text-secondary); }
+
     /* ========= THIS WEEK (one row per day) ========= */
     .week-list {
       display: flex; flex-direction: column; gap: 0.35rem;
@@ -219,6 +233,21 @@
       </div>
     </header>
 
+    <!-- Best time today -->
+    <div class="card animate-in">
+      <div class="card-header">
+        <div class="card-title">
+          <div class="card-icon" style="background: var(--green-soft); color: var(--accent);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          When to go
+        </div>
+      </div>
+      <div id="best-today" class="best-today">
+        <div class="loading">Looking at the patterns...</div>
+      </div>
+    </div>
+
     <!-- This week at a glance -->
     <div class="card animate-in">
       <div class="card-header">
@@ -273,6 +302,11 @@
       const d = new Date(ts);
       return Math.round((d.getHours() * 60 + d.getMinutes()) / 15);
     }
+    function currentSlot() {
+      const d = new Date();
+      return Math.floor((d.getHours() * 60 + d.getMinutes()) / 15);
+    }
+    function isOffHours() { const h = new Date().getHours(); return h < 5 || h >= 22; }
     // "6 PM" for on-the-hour slots, "6:15 PM" otherwise.
     function slotToTime(slot) {
       const total = slot * 15;
@@ -284,6 +318,7 @@
     }
 
     // Best times
+    const DOW_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DOW_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     let bestTimesData = null;
 
@@ -313,6 +348,7 @@
         }
       }
 
+      renderBestToday();
       renderThisWeek();
     }
 
@@ -366,6 +402,61 @@
       if (muted) return `${n} court${n===1?'':'s'}`;
       if (n >= 6) return `all 6 courts`;
       return `${n}+ courts`;
+    }
+
+    function renderBestToday() {
+      const el = document.getElementById('best-today');
+      if (!bestTimesData) { el.innerHTML = '<div class="loading">Looking at the patterns...</div>'; return; }
+
+      const today = new Date().getDay();
+      const hd = bestTimesData[today];
+
+      // Off-hours: jump straight to tomorrow's best
+      if (isOffHours()) {
+        const tomorrow = (today + 1) % 7;
+        const th = bestTimesData[tomorrow];
+        const best = findBestWindow(th, 5) || findBestWindow(th, 4);
+        if (best) {
+          const muted = best.maxMedian < 5;
+          el.className = 'best-today' + (muted ? ' muted' : '');
+          el.innerHTML = `<div class="best-today-line">Tomorrow's best: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${DOW_NAMES[tomorrow]}, ${windowMeta(best.maxMedian, muted)}</div>`;
+        } else {
+          el.className = 'best-today quiet';
+          el.innerHTML = `<div class="best-today-line">Quiet hours.</div>`;
+        }
+        return;
+      }
+
+      const cur = currentSlot();
+
+      // Best remaining window today at >=5
+      let best = findBestWindow(hd, 5, cur);
+      if (best) {
+        el.className = 'best-today';
+        el.innerHTML = `<div class="best-today-line">Best time today: <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, false)}</div>`;
+        return;
+      }
+
+      // Softer fallback: >=4 still available today
+      best = findBestWindow(hd, 4, cur);
+      if (best) {
+        el.className = 'best-today muted';
+        el.innerHTML = `<div class="best-today-line">Decent shot around <strong>${formatWindow(best.startSlot, best.endSlot)}</strong></div><div class="best-today-meta">${windowMeta(best.maxMedian, true)} -- not usually 5+, but playable</div>`;
+        return;
+      }
+
+      // Nothing worth it left today -- peek tomorrow
+      const tomorrow = (today + 1) % 7;
+      const th = bestTimesData[tomorrow];
+      const tm = findBestWindow(th, 5) || findBestWindow(th, 4);
+      if (tm) {
+        const muted = tm.maxMedian < 5;
+        el.className = 'best-today muted';
+        el.innerHTML = `<div class="best-today-line">No busy window left today.</div><div class="best-today-meta">Tomorrow's best is usually <strong>${formatWindow(tm.startSlot, tm.endSlot)}</strong> (${windowMeta(tm.maxMedian, muted)}).</div>`;
+      } else {
+        el.className = 'best-today quiet';
+        el.innerHTML = `<div class="best-today-line">Usually quiet today.</div>`;
+      }
     }
 
     function renderThisWeek() {
